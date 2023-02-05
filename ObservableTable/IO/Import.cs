@@ -19,6 +19,7 @@ public static class Importer
         while (csvReader.Read())
         {
             var thisRow = csvReader.Parser.Record;
+            if (thisRow is null) { continue; }
             records.Add(thisRow);
         }
         return records;
@@ -37,8 +38,12 @@ public static class Importer
         using CsvReader csvReader = new(streamReader, configuration);
 
         var records = GetRecords(csvReader);
-        var headers = GetHeader(records[0], hasHeader);
-        if (hasHeader) { records.RemoveAt(0); }
+        var headers = new List<string>();
+        if (records.Count > 0)
+        {
+            headers = GetHeader(records[0], hasHeader).ToList();
+            if (hasHeader) { records.RemoveAt(0); }
+        }
 
         return new ObservableTable<string>(headers, records);
     }

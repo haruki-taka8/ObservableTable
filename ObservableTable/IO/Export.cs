@@ -6,6 +6,7 @@ public static class Exporter
 {
     private static string ConcatenateList(IList<string?> list)
     {
+        if (list.Count == 0) { return ""; }
         return '"' + string.Join("\",\"", list) + '"';
     }
 
@@ -15,6 +16,11 @@ public static class Exporter
 
         foreach (var record in table.Records)
         {
+            if (string.IsNullOrEmpty(result))
+            {
+                result = ConcatenateList(record);
+                continue;
+            }
             result += Environment.NewLine + ConcatenateList(record);
         }
         return result;
