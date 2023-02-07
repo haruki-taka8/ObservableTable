@@ -1,5 +1,4 @@
 using ObservableTable.IO;
-using System.Diagnostics;
 
 namespace UnitTest.IO;
 
@@ -17,9 +16,7 @@ public class Output
 
     private static void AssertTable(string actualTableString)
     {
-        Assert.AreEqual(
-            expectedTableString, actualTableString, false
-        );
+        Assert.AreEqual(expectedTableString, actualTableString, false);
     }
 
     [TestMethod]
@@ -69,9 +66,7 @@ public class Output
 
         var actualTableString = Exporter.ToCsvString(table, true);
 
-        Assert.AreEqual(
-            FirstRowInCsvFile, actualTableString, false
-        );
+        Assert.AreEqual(FirstRowInCsvFile, actualTableString, false);
     }
 
     [TestMethod]
@@ -81,9 +76,7 @@ public class Output
 
         var actualTableString = Exporter.ToCsvString(table, false);
 
-        Assert.AreEqual(
-            FirstRowInCsvFile, actualTableString, false
-        );
+        Assert.AreEqual(FirstRowInCsvFile, actualTableString, false);
     }
 
     [TestMethod]

@@ -1,4 +1,7 @@
-﻿namespace ObservableTable.Core;
+﻿using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("UnitTest")]
+namespace ObservableTable.Core;
 
 internal enum Change
 {

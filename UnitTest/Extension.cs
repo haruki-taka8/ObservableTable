@@ -22,4 +22,16 @@ internal static class Extension
 
         return true;
     }
+
+    internal static bool ContentEquals<T>(this Operation<T> operand1, Operation<T> operand2)
+    {
+        // Headers
+        foreach (var property in operand1.GetType().GetProperties())
+        {
+            if (property.GetValue(operand1) != property.GetValue(operand2))
+            { return false; }
+        }
+
+        return true;
+    }
 }

@@ -1,5 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("UnitTest")]
 namespace ObservableTable.Core;
 
 public class ObservableTable<T>
@@ -25,7 +28,7 @@ public class ObservableTable<T>
         foreach (var record in records)
         {
             // Register CollectionChanged for each row
-            ObservableCollection<T?> toAdd = new(record.PadRight(Headers.Count));
+            ObservableCollection<T?> toAdd = new(record.SetWidth(Headers.Count));
             toAdd.CollectionChanged += RecordChanged;
             Records.Add(toAdd);
         }
@@ -33,8 +36,8 @@ public class ObservableTable<T>
 
     public ObservableTable(IEnumerable<T> headers, IEnumerable<T?[]> records) : this(new List<T>(headers), records) { }
 
-    // Methods: Private
-    private void RecordChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    // Methods: internal
+    internal void RecordChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.Action != NotifyCollectionChangedAction.Replace
             || sender is null
@@ -52,11 +55,11 @@ public class ObservableTable<T>
     // Methods: Row/Column Modifications
     public void InsertRow(int index, params IList<T?>[] items)
     {
-        if (index < 0 || index > Records.Count - 1) { return; }
+        if (index < 0 || index > Records.Count) { return; }
 
         foreach (var item in items.Reverse())
         {
-            IList<T?> baseToAdd = item.PadRight(Headers.Count);
+            IList<T?> baseToAdd = item.SetWidth(Headers.Count);
             ObservableCollection<T?> toAdd = new(baseToAdd);
             toAdd.CollectionChanged += RecordChanged;
 
@@ -78,7 +81,7 @@ public class ObservableTable<T>
 
     public void InsertColumn(int index, params (T Header, IEnumerable<T?> Content)[] payload)
     {
-        if (index > Headers.Count - 1 || index < 0) { return; }
+        if (index < 0 || index > Headers.Count) { return; }
 
         foreach (var (header, content) in payload)
         {
@@ -89,7 +92,7 @@ public class ObservableTable<T>
         CommitHistory();
     }
 
-    private void InsertColumn(int index, T header, IEnumerable<T?> content)
+    internal void InsertColumn(int index, T header, IEnumerable<T?> content)
     {
         for (int i = 0; i < Records.Count; i++)
         {
@@ -103,7 +106,7 @@ public class ObservableTable<T>
         foreach (var header in headers)
         {
             int index = Headers.IndexOf(header);
-            if (index == -1) { return; }
+            if (index == -1) { continue; }
 
             var removedColumn = RemoveColumn(index);
             UndoStack.Push(new(Change.RemoveColumn, index, parity, header, removedColumn));
@@ -111,7 +114,7 @@ public class ObservableTable<T>
         CommitHistory();
     }
 
-    private IEnumerable<T?> RemoveColumn(int index)
+    internal IEnumerable<T?> RemoveColumn(int index)
     {
         // Remove header first to prevent binding failures
         Headers.RemoveAt(index);
@@ -126,7 +129,7 @@ public class ObservableTable<T>
     }
 
     // Methods: History
-    private void RevertHistory(Operation<T> last)
+    internal void RevertHistory(Operation<T> last)
     {
         switch (last.Change)
         {
@@ -157,7 +160,7 @@ public class ObservableTable<T>
         }
     }
 
-    private Operation<T> UpdateCellInOperation(Operation<T> operation)
+    internal Operation<T> UpdateCellInOperation(Operation<T> operation)
     {
         var output = operation.DeepCopy();
         if (output.Change == Change.Inline)
@@ -192,7 +195,7 @@ public class ObservableTable<T>
         { Redo(); }
     }
 
-    private void CommitHistory()
+    internal void CommitHistory()
     {
         RedoStack.Clear();
         parity = !parity;
