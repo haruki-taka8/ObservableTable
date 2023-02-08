@@ -53,9 +53,9 @@ public class UpdateCellInOperation
     public void UpdateCellInOperation_InsertColumn_DeepCopied()
     {
         var table = Helper.GetSampleTable();
-        Operation<string> expected = new(Change.InsertColumn, 0, true, new string[] { "A1", "A2" });
+        Operation<string> expected = new(Change.InsertColumn, 0, true, "A0", new string[] { "A1", "A2" });
 
-        Operation<string> actual = new(Change.InsertRow, 0, true, new string[] { "A1", "A2" });
+        Operation<string> actual = new(Change.InsertColumn, 0, true, "A0", new string[] { "A1", "A2" });
         table.UpdateCellInOperation(actual);
 
         Assert.IsTrue(expected.ContentEquals(actual));
@@ -66,9 +66,9 @@ public class UpdateCellInOperation
     public void UpdateCellInOperation_RemoveColumn_DeepCopied()
     {
         var table = Helper.GetSampleTable();
-        Operation<string> expected = new(Change.RemoveColumn, 0, true, new string[] { "A1", "A2" });
+        Operation<string> expected = new(Change.RemoveColumn, 0, true, "A0", new string[] { "A1", "A2" });
 
-        Operation<string> actual = new(Change.RemoveColumn, 0, true, new string[] { "A1", "A2" });
+        Operation<string> actual = new(Change.RemoveColumn, 0, true, "A0", new string[] { "A1", "A2" });
         table.UpdateCellInOperation(actual);
 
         Assert.IsTrue(expected.ContentEquals(actual));
