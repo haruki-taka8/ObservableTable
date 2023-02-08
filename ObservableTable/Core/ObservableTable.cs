@@ -21,7 +21,7 @@ public class ObservableTable<T>
     // Constructors
     public ObservableTable() { }
 
-    public ObservableTable(IList<T> headers, IEnumerable<T?[]> records)
+    public ObservableTable(IEnumerable<T> headers, IEnumerable<T?[]> records)
     {
         Headers = new(headers);
 
@@ -33,8 +33,6 @@ public class ObservableTable<T>
             Records.Add(toAdd);
         }
     }
-
-    public ObservableTable(IEnumerable<T> headers, IEnumerable<T?[]> records) : this(new List<T>(headers), records) { }
 
     // Methods: internal
     internal void RecordChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -56,8 +54,8 @@ public class ObservableTable<T>
     public void InsertRow(int index, params IList<T?>[] items)
     {
         if (index < 0 || index > Records.Count) { return; }
-
-        foreach (var item in items.Reverse())
+        
+        foreach (var item in items)
         {
             IList<T?> baseToAdd = item.SetWidth(Headers.Count);
             ObservableCollection<T?> toAdd = new(baseToAdd);
@@ -65,6 +63,7 @@ public class ObservableTable<T>
 
             Records.Insert(index, toAdd);
             UndoStack.Push(new(Change.InsertRow, index, parity, baseToAdd));
+            index++;
         }
         CommitHistory();
     }
