@@ -43,6 +43,9 @@ internal class Operation<T>
     /// <param name="change">Must be Change.InsertColumn or Change.RemoveColumn</param>
     internal Operation(Change change, int index, bool parity, T header, IEnumerable<T?> column) : this(change, index, parity)
     {
+        if (change != Change.InsertColumn && change != Change.RemoveColumn)
+        { throw new ArgumentException(null, nameof(change)); }
+
         Header = header;
         Column = column;
     }
@@ -51,8 +54,11 @@ internal class Operation<T>
     /// Use this constructor for insertion/removal of a row
     /// </summary>
     /// <param name="change">Must be Change.InsertRow or Change.RemoveRow</param>
-    internal Operation(Change change, int index, bool parity, IList<T?> row) : this(change, index, parity)
+    internal Operation(Change change, int index, bool parity, IEnumerable<T?> row) : this(change, index, parity)
     {
+        if (change != Change.InsertRow && change != Change.RemoveRow)
+        { throw new ArgumentException(null, nameof(change)); }
+
         Row = row;
     }
 
@@ -64,6 +70,9 @@ internal class Operation<T>
     /// <param name="cellIndex">An non-negative integer indicating the column number of the modified cell</param>
     internal Operation(Change change, int index, bool parity, T? cell, int? cellIndex) : this(change, index, parity)
     {
+        if (change != Change.Inline)
+        { throw new ArgumentException(null, nameof(change)); }
+
         Cell = cell;
         CellIndex = cellIndex;
     }
