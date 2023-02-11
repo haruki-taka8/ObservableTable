@@ -142,6 +142,34 @@ public class Redo
     }
 
     [TestMethod]
+    public void Redo_SetCell_OperationReverted()
+    {
+        var expected = Helper.GetSampleTable();
+        var actual = Helper.GetSampleTable();
+
+        actual.SetCell((0, 0, "Test"));
+        actual.Undo();
+        Assert.IsTrue(expected.ContentEquals(actual));
+
+        actual.Redo();
+        Assert.IsFalse(expected.ContentEquals(actual));
+    }
+
+    [TestMethod]
+    public void Redo_SetCells_OperationReverted()
+    {
+        var expected = Helper.GetSampleTable();
+        var actual = Helper.GetSampleTable();
+
+        actual.SetCell((0, 0, "Test1"), (1, 1, "Test2"));
+        actual.Undo();
+        Assert.IsTrue(expected.ContentEquals(actual));
+
+        actual.Redo();
+        Assert.IsFalse(expected.ContentEquals(actual));
+    }
+
+    [TestMethod]
     public void Redo_Mix_OperationsReverted()
     {
         var expected = Helper.GetSampleTable();
