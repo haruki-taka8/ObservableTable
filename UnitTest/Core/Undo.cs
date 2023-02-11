@@ -133,6 +133,32 @@ public class Undo
     }
 
     [TestMethod]
+    public void Undo_SetCell_OperationReverted()
+    {
+        var expected = Helper.GetSampleTable();
+        var actual = Helper.GetSampleTable();
+
+        actual.SetCell((0, 0, "Test"));
+        Assert.IsFalse(expected.ContentEquals(actual));
+
+        actual.Undo();
+        Assert.IsTrue(expected.ContentEquals(actual));
+    }
+
+    [TestMethod]
+    public void Undo_SetCells_OperationsReverted()
+    {
+        var expected = Helper.GetSampleTable();
+        var actual = Helper.GetSampleTable();
+
+        actual.SetCell((0, 0, "Test1"), (1, 1, "Test2"));
+        Assert.IsFalse(expected.ContentEquals(actual));
+
+        actual.Undo();
+        Assert.IsTrue(expected.ContentEquals(actual));
+    }
+
+    [TestMethod]
     public void Undo_Mix_OperationsReverted()
     {
         var expected = Helper.GetSampleTable();

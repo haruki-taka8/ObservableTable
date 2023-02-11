@@ -127,6 +127,26 @@ public class ObservableTable<T>
         return column;
     }
 
+    public void SetCell(params (int row, int col, T? cellContent)[] payload)
+    {
+        foreach (var (row, col, cellContent) in payload)
+        {
+            if (row < 0 || col < 0 || row > Records.Count || col > Headers.Count)
+            { continue; }
+
+            UndoStack.Push(new(Change.Inline, row, parity, Records[row][col], col));
+            SetCell(row, col, cellContent);
+        }
+        CommitHistory();
+    }
+
+    private void SetCell(int row, int col, T? cellContent)
+    {
+        Records[row].CollectionChanged -= RecordChanged;
+        Records[row][col] = cellContent;
+        Records[row].CollectionChanged += RecordChanged;
+    }
+
     // Methods: History
     internal void RevertHistory(Operation<T> last)
     {
@@ -151,10 +171,7 @@ public class ObservableTable<T>
                 break;
 
             case Change.Inline:
-                // Avoid pushing this change to UndoStack
-                Records[last.Index].CollectionChanged -= RecordChanged;
-                Records[last.Index][last.CellIndex ?? 0] = last.Cell;
-                Records[last.Index].CollectionChanged += RecordChanged;
+                SetCell(last.Index, last.CellIndex ?? 0, last.Cell);
                 break;
         }
     }
