@@ -16,14 +16,9 @@ public static class Exporter
 
         foreach (var record in table.Records)
         {
-            if (string.IsNullOrEmpty(result))
-            {
-                result = ConcatenateList(record);
-                continue;
-            }
             result += Environment.NewLine + ConcatenateList(record);
         }
-        return result;
+        return result.Trim();
     }
 
     public static void ToFile(string path, ObservableTable<string> table, bool hasHeader = true)
