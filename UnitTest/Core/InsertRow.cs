@@ -6,14 +6,12 @@ namespace UnitTest.Core;
 public class InsertRow
 {
     [TestMethod]
-    public void InsertRow_NegativeIndex_Nothing()
+    public void InsertRow_NegativeIndex_Exception()
     {
-        var expected = Helper.GetSampleTable();
-
         var actual = Helper.GetSampleTable();
-        actual.InsertRow(-1, new List<string?>() { "A2" });
-
-        Assert.IsTrue(expected.ContentEquals(actual));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+            actual.InsertRow(-1, new string?[] { "A3" })
+        );
     }
 
     [TestMethod]
@@ -55,14 +53,12 @@ public class InsertRow
     }
 
     [TestMethod]
-    public void InsertRow_OverflowIndex_Nothing()
+    public void InsertRow_OverflowIndex_Exception()
     {
-        var expected = Helper.GetSampleTable();
-
         var actual = Helper.GetSampleTable();
-        actual.InsertRow(actual.Records.Count + 1, new string?[] { "A3" });
-
-        Assert.IsTrue(expected.ContentEquals(actual));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+            actual.InsertRow(actual.Records.Count + 1, new string?[] { "A3" })
+        );
     }
 
     [TestMethod]
@@ -88,44 +84,23 @@ public class InsertRow
     }
 
     [TestMethod]
-    public void InsertRow_RowTooLong_TruncatedNewRow()
+    public void InsertRow_RowTooLong_Exception()
     {
-        ObservableTable<string> expected = new(
-            headers: new string[] { "A0", "B0", "C0" },
-            records: new List<string?[]>()
-            {
-                new string?[] { "A0", "B0", "C0"},
-                new string?[] { "A1", "B1", "C1" },
-                new string?[] { "A2", "B2", "C2" },
-            }
-        );
-
         var actual = Helper.GetSampleTable();
-        actual.InsertRow(0, new string?[] { "A0", "B0", "C0", "Extra1", "Extra2" } );
-
-        Assert.IsTrue(expected.ContentEquals(actual));
+        Assert.ThrowsException<ArgumentException>(() =>
+            actual.InsertRow(0, new string?[] { "A0", "B0", "C0", "Extra1", "Extra2" })
+        );
     }
 
     [TestMethod]
-    public void InsertRow_RowTooLongWithNormalRow_TruncatedNewRow()
+    public void InsertRow_RowTooLongWithNormalRow_Exception()
     {
-        ObservableTable<string> expected = new(
-            headers: new string[] { "A0", "B0", "C0" },
-            records: new List<string?[]>()
-            {
-                new string?[] { "A0", "B0", "C0"},
-                new string?[] { "A1", "B1", "C1"},
-                new string?[] { "A1", "B1", "C1" },
-                new string?[] { "A2", "B2", "C2" },
-            }
-        );
-
         var actual = Helper.GetSampleTable();
-        actual.InsertRow(0,
-            new string?[] { "A0", "B0", "C0", "Extra1", "Extra2" },
-            new string?[] { "A1", "B1", "C1" }
-       );
-
-        Assert.IsTrue(expected.ContentEquals(actual));
+        Assert.ThrowsException<ArgumentException>(() =>
+            actual.InsertRow(0,
+                new string?[] { "A0", "B0", "C0", "Extra1", "Extra2" },
+                new string?[] { "A1", "B1", "C1" }
+            )
+        );
     }
 }

@@ -28,7 +28,7 @@ public class ObservableTable<T>
         foreach (var record in records)
         {
             // Register CollectionChanged for each row
-            ObservableCollection<T?> toAdd = new(record.SetWidth(Headers.Count));
+            ObservableCollection<T?> toAdd = new(record.PadRight(Headers.Count));
             toAdd.CollectionChanged += RecordChanged;
             Records.Add(toAdd);
         }
@@ -52,12 +52,10 @@ public class ObservableTable<T>
 
     // Methods: Row/Column Modifications
     public void InsertRow(int index, params IList<T?>[] items)
-    {
-        if (index < 0 || index > Records.Count) { return; }
-        
+    {        
         foreach (var item in items)
         {
-            IList<T?> baseToAdd = item.SetWidth(Headers.Count);
+            IList<T?> baseToAdd = item.PadRight(Headers.Count);
             ObservableCollection<T?> toAdd = new(baseToAdd);
             toAdd.CollectionChanged += RecordChanged;
 
@@ -80,10 +78,11 @@ public class ObservableTable<T>
 
     public void InsertColumn(int index, params (T Header, IEnumerable<T?> Content)[] payload)
     {
-        if (index < 0 || index > Headers.Count) { return; }
-
         foreach (var (header, content) in payload)
         {
+            if (content.Count() > Records.Count)
+            { throw new ArgumentException("More content than rows", nameof(payload)); }
+
             InsertColumn(index, header, content);
             UndoStack.Push(new(Change.InsertColumn, index, parity, header, content));
             index++;
@@ -105,8 +104,6 @@ public class ObservableTable<T>
         foreach (var header in headers)
         {
             int index = Headers.IndexOf(header);
-            if (index == -1) { continue; }
-
             var removedColumn = RemoveColumn(index);
             UndoStack.Push(new(Change.RemoveColumn, index, parity, header, removedColumn));
         }
@@ -131,9 +128,6 @@ public class ObservableTable<T>
     {
         foreach (var (row, col, cellContent) in payload)
         {
-            if (row < 0 || col < 0 || row > Records.Count || col > Headers.Count)
-            { continue; }
-
             UndoStack.Push(new(Change.Inline, row, parity, Records[row][col], col));
             SetCell(row, col, cellContent);
         }
@@ -153,7 +147,7 @@ public class ObservableTable<T>
         switch (last.Change)
         {
             case Change.InsertRow:
-                if (last.Row is null) { break; }
+                if (last.Row is null) throw new InvalidOperationException("Null row");
                 Records.Insert(last.Index, new(last.Row));
                 break;
 
@@ -162,7 +156,8 @@ public class ObservableTable<T>
                 break;
 
             case Change.InsertColumn:
-                if (last.Header is null || last.Column is null) { return; } 
+                if (last.Header is null) throw new InvalidOperationException("Null header");
+                if (last.Column is null) throw new InvalidOperationException("Null column");
                 InsertColumn(last.Index, last.Header, last.Column);
                 break;
 
@@ -171,6 +166,7 @@ public class ObservableTable<T>
                 break;
 
             case Change.Inline:
+                if (last.CellIndex is null) throw new InvalidOperationException("Null cell index");
                 SetCell(last.Index, last.CellIndex ?? 0, last.Cell);
                 break;
         }
@@ -181,6 +177,7 @@ public class ObservableTable<T>
         var output = operation.DeepCopy();
         if (output.Change == Change.Inline)
         {
+            if (output.CellIndex is null) throw new InvalidOperationException("Null cell index");
             output.Cell = Records[output.Index][output.CellIndex ?? 0];
         }
         return output;

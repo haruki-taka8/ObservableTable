@@ -2,11 +2,11 @@
 
 internal static class Extension
 {
-    internal static IList<T?> SetWidth<T>(this IList<T?> list, int resultantLength)
+    internal static IList<T?> PadRight<T>(this IList<T?> list, int resultantLength)
     {
         if (list.Count > resultantLength)
         {
-            return list.SkipLast(list.Count - resultantLength).ToList();
+            throw new ArgumentException("Input list longer than desired resultant length", nameof(list));
         }
 
         var padding = Enumerable.Repeat<T?>(default, resultantLength - list.Count);
