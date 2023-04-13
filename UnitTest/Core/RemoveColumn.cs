@@ -60,32 +60,21 @@ public class RemoveColumn
     }
 
     [TestMethod]
-    public void RemoveColumn_NonexistentColumn_Nothing()
+    public void RemoveColumn_NonexistentColumn_Exception()
     {
-        ObservableTable<string> expected = Helper.GetSampleTable();
-
         var actual = Helper.GetSampleTable();
-        actual.RemoveColumn("Non-existent header");
-
-        Assert.IsTrue(expected.ContentEquals(actual));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+            actual.RemoveColumn("Non-existent header")
+        );
     }
 
     [TestMethod]
-    public void RemoveColumn_NonexistentColumnWithNormalColumn_Nothing()
+    public void RemoveColumn_NonexistentColumnWithNormalColumn_Exception()
     {
-        ObservableTable<string> expected = new(
-            headers: new string[] { "B0", "C0" },
-            records: new List<string?[]>()
-            {
-                new string?[] { "B1", "C1" },
-                new string?[] { "B2", "C2" }
-            }
-        );
-
         var actual = Helper.GetSampleTable();
-        actual.RemoveColumn("Non-existent header", "A0");
-
-        Assert.IsTrue(expected.ContentEquals(actual));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+            actual.RemoveColumn("A0", "Non-existent header", "C0")
+        );
     }
 
     [TestMethod]

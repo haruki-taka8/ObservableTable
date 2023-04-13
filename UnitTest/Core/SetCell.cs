@@ -6,47 +6,39 @@ namespace UnitTest.Core;
 public class SetCell
 {
     [TestMethod]
-    public void SetCell_NegativeRow_Nothing()
+    public void SetCell_NegativeRow_Exception()
     {
-        var expected = Helper.GetSampleTable();
-
         var actual = Helper.GetSampleTable();
-        actual.SetCell((-1, 0, "Test"));
-
-        Assert.IsTrue(expected.ContentEquals(actual));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+            actual.SetCell((-1, 0, "Test"))
+        );
     }
 
     [TestMethod]
-    public void SetCell_NegativeColumn_Nothing()
+    public void SetCell_NegativeColumn_Exception()
     {
-        var expected = Helper.GetSampleTable();
-
         var actual = Helper.GetSampleTable();
-        actual.SetCell((0, -1, "Test"));
-
-        Assert.IsTrue(expected.ContentEquals(actual));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+            actual.SetCell((0, -1, "Test"))
+        );
     }
 
     [TestMethod]
-    public void SetCell_OverflowRow_Nothing()
+    public void SetCell_OverflowRow_Exception()
     {
-        var expected = Helper.GetSampleTable();
-
         var actual = Helper.GetSampleTable();
-        actual.SetCell((100, 0, "Test"));
-
-        Assert.IsTrue(expected.ContentEquals(actual));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+            actual.SetCell((100, 0, "Test"))
+        );
     }
 
     [TestMethod]
-    public void SetCell_OverflowColumn_Nothing()
+    public void SetCell_OverflowColumn_Exception()
     {
-        var expected = Helper.GetSampleTable();
-
         var actual = Helper.GetSampleTable();
-        actual.SetCell((0, 100, "Test"));
-
-        Assert.IsTrue(expected.ContentEquals(actual));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
+            actual.SetCell((0, 100, "Test"))
+        );
     }
 
     [TestMethod]
