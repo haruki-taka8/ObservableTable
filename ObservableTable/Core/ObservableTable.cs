@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("UnitTest")]
@@ -9,208 +8,100 @@ public class ObservableTable<T>
 {
     // Properties & Fields
     public ObservableCollection<ObservableCollection<T?>> Records { get; } = new();
-    public ObservableCollection<T> Headers { get; init; } = new();
+    public ReadOnlyObservableCollection<T> Headers => new(headers);
 
-    public int UndoCount => UndoStack.Count;
-    public int RedoCount => RedoStack.Count;
-
-    private readonly ObservableStack<Operation<T>> UndoStack = new();
-    private readonly ObservableStack<Operation<T>> RedoStack = new();
-    private bool parity;
+    private ObservableCollection<T> headers { get; } = new();
 
     // Constructors
     public ObservableTable() { }
 
-    public ObservableTable(IEnumerable<T> headers, IEnumerable<T?[]> records)
+    public ObservableTable(IEnumerable<T> headers, params IList<T?>[] records)
     {
-        Headers = new(headers);
+        this.headers = new(headers);
+        InsertRow(0, records);
+    }
 
-        foreach (var record in records)
+    // Methods: Record modifications
+    public void InsertRow(int index, params IList<T?>[] rows)
+    {
+        foreach (var row in rows)
         {
-            // Register CollectionChanged for each row
-            ObservableCollection<T?> toAdd = new(record.PadRight(Headers.Count));
-            toAdd.CollectionChanged += RecordChanged;
-            Records.Add(toAdd);
+            InsertRow(index++, row);
         }
     }
 
-    // Methods: internal
-    internal void RecordChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void InsertRow(int index, IList<T?> row)
     {
-        if (e.Action != NotifyCollectionChangedAction.Replace
-            || sender is null
-            || e.OldItems is null)
-        { return; }
-
-        // Handles inline changes
-        var newRecord = (ObservableCollection<T?>)sender;
-        var index = Records.IndexOf(newRecord);
-        var oldCell = (T?)e.OldItems[0];
-        UndoStack.Push(new(Change.Inline, index, parity, oldCell, e.OldStartingIndex));
-        CommitHistory();
+        IList<T?> baseToAdd = row.PadRight(headers.Count);
+        ObservableCollection<T?> toAdd = new(baseToAdd);
+        Records.Insert(index, toAdd);
     }
 
-    // Methods: Row/Column Modifications
-    public void InsertRow(int index, params IList<T?>[] items)
-    {        
-        foreach (var item in items)
+    public void RemoveRow(params ObservableCollection<T?>[] rows)
+    {
+        foreach (var row in rows)
         {
-            IList<T?> baseToAdd = item.PadRight(Headers.Count);
-            ObservableCollection<T?> toAdd = new(baseToAdd);
-            toAdd.CollectionChanged += RecordChanged;
-
-            Records.Insert(index, toAdd);
-            UndoStack.Push(new(Change.InsertRow, index, parity, baseToAdd));
-            index++;
+            RemoveRow(row);
         }
-        CommitHistory();
     }
 
-    public void RemoveRow(params ObservableCollection<T?>[] items)
+    private void RemoveRow(ObservableCollection<T?> row)
     {
-        foreach (var item in items)
+        Records.Remove(row);
+    }
+
+    public void InsertColumn(int index, params ColumnDefinition<T>[] columns)
+    {
+        foreach (var column in columns)
         {
-            UndoStack.Push(new(Change.RemoveRow, Records.IndexOf(item), parity, item));
-            Records.Remove(item);
+            InsertColumn(index++, column);
         }
-        CommitHistory();
     }
 
-    public void InsertColumn(int index, params (T Header, IEnumerable<T?> Content)[] payload)
+    private void InsertColumn(int index, ColumnDefinition<T> column)
     {
-        foreach (var (header, content) in payload)
-        {
-            if (content.Count() > Records.Count)
-            { throw new ArgumentException("More content than rows", nameof(payload)); }
+        var values = column.Values.PadRight(Records.Count);
 
-            InsertColumn(index, header, content);
-            UndoStack.Push(new(Change.InsertColumn, index, parity, header, content));
-            index++;
-        }
-        CommitHistory();
-    }
-
-    internal void InsertColumn(int index, T header, IEnumerable<T?> content)
-    {
         for (int i = 0; i < Records.Count; i++)
         {
-            Records[i].Insert(index, content.ElementAtOrDefault(i));
+            Records[i].Insert(index, values[i]);
         }
-        Headers.Insert(index, header);
+
+        headers.Insert(index, column.Header);
     }
 
     public void RemoveColumn(params T[] headers)
     {
         foreach (var header in headers)
         {
-            int index = Headers.IndexOf(header);
-            var removedColumn = RemoveColumn(index);
-            UndoStack.Push(new(Change.RemoveColumn, index, parity, header, removedColumn));
+            RemoveColumn(header);
         }
-        CommitHistory();
     }
 
-    internal IEnumerable<T?> RemoveColumn(int index)
+    private void RemoveColumn(T header)
     {
         // Remove header first to prevent binding failures
-        Headers.RemoveAt(index);
+        int index = headers.IndexOf(header);
+        headers.Remove(header);
 
-        List<T?> column = new();
+        List<T?> removedColumn = new();
         foreach (var record in Records)
         {
-            column.Add(record[index]);
+            removedColumn.Add(record[index]);
             record.RemoveAt(index);
         }
-        return column;
     }
 
-    public void SetCell(params (int row, int col, T? cellContent)[] payload)
+    public void SetCell(params CellDefinition<T>[] cells)
     {
-        foreach (var (row, col, cellContent) in payload)
+        foreach (var cell in cells)
         {
-            UndoStack.Push(new(Change.Inline, row, parity, Records[row][col], col));
-            SetCell(row, col, cellContent);
-        }
-        CommitHistory();
-    }
-
-    private void SetCell(int row, int col, T? cellContent)
-    {
-        Records[row].CollectionChanged -= RecordChanged;
-        Records[row][col] = cellContent;
-        Records[row].CollectionChanged += RecordChanged;
-    }
-
-    // Methods: History
-    internal void RevertHistory(Operation<T> last)
-    {
-        switch (last.Change)
-        {
-            case Change.InsertRow:
-                if (last.Row is null) throw new InvalidOperationException("Null row");
-                Records.Insert(last.Index, new(last.Row));
-                break;
-
-            case Change.RemoveRow:
-                Records.RemoveAt(last.Index);
-                break;
-
-            case Change.InsertColumn:
-                if (last.Header is null) throw new InvalidOperationException("Null header");
-                if (last.Column is null) throw new InvalidOperationException("Null column");
-                InsertColumn(last.Index, last.Header, last.Column);
-                break;
-
-            case Change.RemoveColumn:
-                RemoveColumn(last.Index);
-                break;
-
-            case Change.Inline:
-                if (last.CellIndex is null) throw new InvalidOperationException("Null cell index");
-                SetCell(last.Index, last.CellIndex ?? 0, last.Cell);
-                break;
+            SetCell(cell);
         }
     }
 
-    internal Operation<T> UpdateCellInOperation(Operation<T> operation)
+    private void SetCell(CellDefinition<T> cell)
     {
-        var output = operation.DeepCopy();
-        if (output.Change == Change.Inline)
-        {
-            if (output.CellIndex is null) throw new InvalidOperationException("Null cell index");
-            output.Cell = Records[output.Index][output.CellIndex ?? 0];
-        }
-        return output;
-    }
-
-    public void Undo()
-    {
-        if (UndoStack.Count == 0) { return; }
-        Operation<T> last = UndoStack.Pop();
-        RedoStack.Push(UpdateCellInOperation(last));
-
-        last.InvertChange();
-        RevertHistory(last);
-
-        if (UndoStack.Count > 0 && last.Parity == UndoStack.Peek().Parity)
-        { Undo(); }
-    }
-
-    public void Redo()
-    {
-        if (RedoStack.Count == 0) { return; }
-        Operation<T> last = RedoStack.Pop();
-        UndoStack.Push(UpdateCellInOperation(last));
-
-        RevertHistory(last);
-
-        if (RedoStack.Count > 0 && last.Parity == RedoStack.Peek().Parity)
-        { Redo(); }
-    }
-
-    internal void CommitHistory()
-    {
-        RedoStack.Clear();
-        parity = !parity;
+        Records[cell.Row][cell.Column] = cell.Value;
     }
 }

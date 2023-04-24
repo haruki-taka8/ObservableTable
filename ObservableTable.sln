@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Internal_WPF", "Internal_WPF\Internal_WPF.csproj", "{257F938D-C796-44E8-A4A8-699A82CB05FD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{30C565E3-7134-45AC-A68D-BEC467DB06A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30C565E3-7134-45AC-A68D-BEC467DB06A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30C565E3-7134-45AC-A68D-BEC467DB06A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{257F938D-C796-44E8-A4A8-699A82CB05FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{257F938D-C796-44E8-A4A8-699A82CB05FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{257F938D-C796-44E8-A4A8-699A82CB05FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{257F938D-C796-44E8-A4A8-699A82CB05FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

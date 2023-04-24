@@ -5,6 +5,7 @@
 
 # User-specific files
 Internal*
+*.bak
 *.rsuser
 *.suo
 *.user
@@ -397,3 +398,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/ObservableTable - Copy
