@@ -13,23 +13,23 @@ public static class Importer
         BadDataFound = null
     };
 
-    private static List<string?[]> GetRecords(CsvReader csvReader)
+    private static IList<IList<string?>> GetRecords(CsvReader csvReader)
     {
-        List<string?[]> records = new();
+        IList<IList<string?>> records = new List<IList<string?>>();
         while (csvReader.Read())
         {
-            var thisRow = csvReader.Parser.Record;
+            var thisRow = csvReader.Parser.Record?.ToList();
             if (thisRow is null) { continue; }
             records.Add(thisRow);
         }
         return records;
     }
 
-    private static IEnumerable<string> GetHeader(string?[] firstRecord, bool hasHeader = true)
+    private static IEnumerable<string> GetHeader(IEnumerable<string?> firstRecord, bool hasHeader = true)
     {
         return hasHeader
             ? firstRecord.Select(x => x ?? "")
-            : Enumerable.Range(0, firstRecord.Length).Select(x => x.ToString());
+            : Enumerable.Range(0, firstRecord.Count()).Select(x => x.ToString());
     }
 
     public static ObservableTable<string> FromFilePath(string filePath, bool hasHeader = true)
@@ -45,6 +45,6 @@ public static class Importer
             if (hasHeader) { records.RemoveAt(0); }
         }
 
-        return new ObservableTable<string>(headers, records);
+        return new ObservableTable<string>(headers, records.ToArray());
     }
 }

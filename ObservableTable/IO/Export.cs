@@ -1,4 +1,5 @@
 ﻿using ObservableTable.Core;
+using System.Text;
 
 namespace ObservableTable.IO;
 
@@ -12,13 +13,14 @@ public static class Exporter
 
     public static string ToCsvString(ObservableTable<string> table, bool hasHeader = true)
     {
-        string result = hasHeader ? ConcatenateList((IList<string?>)table.Headers) : "";
+        StringBuilder builder = new();
+        if (hasHeader) { builder.AppendLine(ConcatenateList((IList<string?>)table.Headers)); }
 
         foreach (var record in table.Records)
         {
-            result += Environment.NewLine + ConcatenateList(record);
+            builder.AppendLine(ConcatenateList(record));
         }
-        return result.Trim();
+        return builder.ToString().Trim();
     }
 
     public static void ToFile(string path, ObservableTable<string> table, bool hasHeader = true)

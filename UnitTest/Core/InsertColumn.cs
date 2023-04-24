@@ -10,7 +10,7 @@ public class InsertColumn
     {
         var actual = Helper.GetSampleTable();
         Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
-            actual.InsertColumn(-1, ("D0", new List<string?>()))
+            actual.InsertColumn(-1, new ColumnDefinition<string>("D0"))
         );
     }
 
@@ -18,16 +18,13 @@ public class InsertColumn
     public void InsertColumn_ZeroIndex_NewColumn()
     {
         ObservableTable<string> expected = new(
-            headers: new string[] { "D0", "A0", "B0", "C0" },
-            records: new List<string?[]>()
-            {
-                new string?[] { null, "A1", "B1", "C1" },
-                new string?[] { null, "A2", "B2", "C2" }
-            }
+            new string[] { "D0", "A0", "B0", "C0" },
+            new string?[] { null, "A1", "B1", "C1" },
+            new string?[] { null, "A2", "B2", "C2" }
         );
 
         var actual = Helper.GetSampleTable();
-        actual.InsertColumn(0, ("D0", new List<string?>()));
+        actual.InsertColumn(0, new ColumnDefinition<string>("D0"));
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
@@ -36,16 +33,13 @@ public class InsertColumn
     public void InsertColumn_LastIndex_NewColumn()
     {
         ObservableTable<string> expected = new(
-            headers: new string[] { "A0", "B0", "C0", "D0" },
-            records: new List<string?[]>()
-            {
-                new string?[] { "A1", "B1", "C1", null },
-                new string?[] { "A2", "B2", "C2", null }
-            }
+            new string[] { "A0", "B0", "C0", "D0" },
+            new string?[] { "A1", "B1", "C1", null },
+            new string?[] { "A2", "B2", "C2", null }
         );
 
         var actual = Helper.GetSampleTable();
-        actual.InsertColumn(actual.Headers.Count, ("D0", new List<string?>()));
+        actual.InsertColumn(actual.Headers.Count, new ColumnDefinition<string>("D0"));
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
@@ -55,7 +49,7 @@ public class InsertColumn
     {
         var actual = Helper.GetSampleTable();
         Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
-            actual.InsertColumn(actual.Headers.Count + 1, ("D0", new List<string?>()))
+            actual.InsertColumn(actual.Headers.Count + 1, new ColumnDefinition<string>("D0"))
         );
     }
 
@@ -63,18 +57,15 @@ public class InsertColumn
     public void InsertColumn_TwoColumns_NewColumns()
     {
         ObservableTable<string> expected = new(
-            headers: new string[] { "D0", "E0", "A0", "B0", "C0" },
-            records: new List<string?[]>()
-            {
-                new string?[] { null, "E1", "A1", "B1", "C1" },
-                new string?[] { null, "E2", "A2", "B2", "C2" }
-            }
+            new string[] { "D0", "E0", "A0", "B0", "C0" },
+            new string?[] { null, "E1", "A1", "B1", "C1" },
+            new string?[] { null, "E2", "A2", "B2", "C2" }
         );
 
         var actual = Helper.GetSampleTable();
         actual.InsertColumn(0,
-            ("D0", new List<string?>()),
-            ("E0", new string[] { "E1", "E2" })
+            new("D0"),
+            new("E0", new string[] { "E1", "E2" })
         );
 
         Assert.IsTrue(expected.ContentEquals(actual));
@@ -85,7 +76,7 @@ public class InsertColumn
     {
         var actual = Helper.GetSampleTable();
         Assert.ThrowsException<ArgumentException>(() =>
-            actual.InsertColumn(0, ("D0", new string[] { "D1", "D2", "D3" }))
+            actual.InsertColumn(0, new ColumnDefinition<string>("D0", new string[] { "D1", "D2", "D3" }))
         );
     }
 
@@ -95,8 +86,8 @@ public class InsertColumn
         var actual = Helper.GetSampleTable();
         Assert.ThrowsException<ArgumentException>(() =>
             actual.InsertColumn(0,
-                ("D0", new string[] { "D1", "D2", "D3" }),
-                ("E0", new string[] { "E1", "E2" })
+                new("D0", new string[] { "D1", "D2", "D3" }),
+                new("E0", new string[] { "E1", "E2" })
             )
         );
     }

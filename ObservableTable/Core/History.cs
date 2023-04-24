@@ -12,19 +12,19 @@ internal enum Change
     RemoveColumn
 }
 
-internal class OperationBase
+internal class EditBase
 {
     internal int Parity { get; init; }
     internal Change Change { get; set; }
-    internal virtual OperationBase DeepCopy() { return new(); }
+    internal virtual EditBase DeepCopy() { return new(); }
 
     // Unused for CellOperation<T>
     internal int Index { get; init; }
     internal virtual void InvertOperation() { }
 }
 
-internal class RowOperation<T> : OperationBase
-{
+internal class RowEdit<T> : EditBase
+    {
     internal RowDefinition<T> Row { get; init; }
 
     internal override void InvertOperation()
@@ -32,9 +32,9 @@ internal class RowOperation<T> : OperationBase
         Change = Change == Change.InsertRow ? Change.RemoveRow : Change.InsertRow;
     }
 
-    internal override RowOperation<T> DeepCopy() => new(Parity, Index, Change, Row);
+    internal override RowEdit<T> DeepCopy() => new(Parity, Index, Change, Row);
 
-    public RowOperation(int parity, int index, Change change, RowDefinition<T> row)
+    internal RowEdit(int parity, int index, Change change, RowDefinition<T> row)
     {
         Parity = parity;
         Index = index;
@@ -43,8 +43,8 @@ internal class RowOperation<T> : OperationBase
     }
 }
 
-internal class ColumnOperation<T> : OperationBase
-{
+internal class ColumnEdit<T> : EditBase
+    {
     internal ColumnDefinition<T> Column { get; init; }
 
     internal override void InvertOperation()
@@ -52,9 +52,9 @@ internal class ColumnOperation<T> : OperationBase
         Change = Change == Change.InsertColumn ? Change.RemoveColumn : Change.InsertColumn;
     }
 
-    internal override ColumnOperation<T> DeepCopy() => new(Parity, Index, Change, Column);
+    internal override ColumnEdit<T> DeepCopy() => new(Parity, Index, Change, Column);
 
-    public ColumnOperation(int parity, int index, Change change, ColumnDefinition<T> column)
+    internal ColumnEdit(int parity, int index, Change change, ColumnDefinition<T> column)
     {
         Parity = parity;
         Index = index;
@@ -62,13 +62,14 @@ internal class ColumnOperation<T> : OperationBase
         Column = column;
     }
 }
-internal class CellOperation<T> : OperationBase
+
+internal class CellEdit<T> : EditBase
 {
     internal CellDefinition<T> Cell { get; set; }
 
-    internal override CellOperation<T> DeepCopy() => new(Parity, Cell);
+    internal override CellEdit<T> DeepCopy() => new(Parity, Cell);
 
-    public CellOperation(int parity, CellDefinition<T> cell)
+    internal CellEdit(int parity, CellDefinition<T> cell)
     {
         Parity = parity;
         Cell = cell;
