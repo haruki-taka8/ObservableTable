@@ -9,12 +9,9 @@ public class RemoveColumn
     public void RemoveColumn_ExistentColumn_RemovedColumn()
     {
         ObservableTable<string> expected = new(
-            headers: new string[] { "B0", "C0" },
-            records: new List<string?[]>()
-            {
-                new string?[] { "B1", "C1" },
-                new string?[] { "B2", "C2" }
-            }
+            new string[] { "B0", "C0" },
+            new string?[] { "B1", "C1" },
+            new string?[] { "B2", "C2" }
         );
 
         var actual = Helper.GetSampleTable();
@@ -27,12 +24,9 @@ public class RemoveColumn
     public void RemoveColumn_ExistentColumns_RemovedColumns()
     {
         ObservableTable<string> expected = new(
-            headers: new string[] { "C0" },
-            records: new List<string?[]>()
-            {
-                new string?[] { "C1" },
-                new string?[] { "C2" }
-            }
+            new string[] { "C0" },
+            new string?[] { "C1" },
+            new string?[] { "C2" }
         );
 
         var actual = Helper.GetSampleTable();
@@ -45,12 +39,9 @@ public class RemoveColumn
     public void RemoveColumn_AllColumns_EmptyTable()
     {
         ObservableTable<string> expected = new(
-            headers: Array.Empty<string>(),
-            records: new List<string?[]>()
-            {
-                Array.Empty<string>(),
-                Array.Empty<string>()
-            }
+            Array.Empty<string>(),
+            Array.Empty<string>(),
+            Array.Empty<string>()
         );
 
         var actual = Helper.GetSampleTable();

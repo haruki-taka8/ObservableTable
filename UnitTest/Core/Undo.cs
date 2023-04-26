@@ -1,4 +1,6 @@
-﻿namespace UnitTest.Core;
+﻿using ObservableTable.Core;
+
+namespace UnitTest.Core;
 
 [TestClass]
 public class Undo
@@ -48,7 +50,7 @@ public class Undo
         var expected = Helper.GetSampleTable();
         var actual = Helper.GetSampleTable();
 
-        actual.InsertColumn(0, ("Test", Array.Empty<string>()));
+        actual.InsertColumn(0, new Column<string>("Test"));
         Assert.IsFalse(expected.ContentEquals(actual));
 
         actual.Undo();
@@ -100,7 +102,7 @@ public class Undo
         var expected = Helper.GetSampleTable();
         var actual = Helper.GetSampleTable();
 
-        actual.InsertColumn(0, ("F0", Array.Empty<string>()), ("G0", Array.Empty<string>()));
+        actual.InsertColumn(0, new("F0"), new("G0"));
         Assert.IsFalse(expected.ContentEquals(actual));
 
         actual.Undo();
@@ -138,7 +140,7 @@ public class Undo
         var expected = Helper.GetSampleTable();
         var actual = Helper.GetSampleTable();
 
-        actual.SetCell((0, 0, "Test"));
+        actual.SetCell(new Cell<string>(0, 0, "Test"));
         Assert.IsFalse(expected.ContentEquals(actual));
 
         actual.Undo();
@@ -151,7 +153,7 @@ public class Undo
         var expected = Helper.GetSampleTable();
         var actual = Helper.GetSampleTable();
 
-        actual.SetCell((0, 0, "Test1"), (1, 1, "Test2"));
+        actual.SetCell(new(0, 0, "Test1"), new(1, 1, "Test2"));
         Assert.IsFalse(expected.ContentEquals(actual));
 
         actual.Undo();

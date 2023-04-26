@@ -11,7 +11,7 @@ public class RemoveRow
     {
         ObservableTable<string> expected = new(
             headers: new string[] { "A0", "B0", "C0" },
-            records: new List<string?[]>() { new string?[] { "A2", "B2", "C2" } }
+            records: new string?[] { "A2", "B2", "C2" }
         );
 
         var actual = Helper.GetSampleTable();
@@ -24,8 +24,7 @@ public class RemoveRow
     public void RemoveRow_ExistentRows_RowsRemoved()
     {
         ObservableTable<string> expected = new(
-            headers: new string[] { "A0", "B0", "C0" },
-            records: new List<string?[]>()
+            headers: new string[] { "A0", "B0", "C0" }
         );
 
         var actual = Helper.GetSampleTable();
@@ -49,8 +48,8 @@ public class RemoveRow
     public void RemoveRow_NonAndExistentRow_RowRemoved()
     {
         ObservableTable<string> expected = new(
-            headers: new string[] { "A0", "B0", "C0" },
-            records: new List<string?[]>() { new string?[] { "A2", "B2", "C2" } }
+            new string[] { "A0", "B0", "C0" },
+            new string?[] { "A2", "B2", "C2" }
         );
 
         var actual = Helper.GetSampleTable();
@@ -63,8 +62,7 @@ public class RemoveRow
     public void RemoveRow_AllRows_EmptyTable()
     {
         ObservableTable<string> expected = new(
-            headers: new string[] { "A0", "B0", "C0" },
-            records: new List<string?[]>()
+            new string[] { "A0", "B0", "C0" }
         );
 
         var actual = Helper.GetSampleTable();

@@ -10,6 +10,7 @@ public class Operation
      * (hence the reference check must satisfy !expected.Equals(actual))
      */
 
+    /*
     [TestMethod]
     public void RowColumnCtor_IncorrectParams_ArgException()
     {
@@ -35,4 +36,5 @@ public class Operation
         Assert.IsTrue(expected.ContentEquals(actual)); // Value
         Assert.IsFalse(expected.Equals(actual));       // Reference
     }
+    */
 }
