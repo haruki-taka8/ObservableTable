@@ -39,9 +39,9 @@ public class RemoveColumn
     public void RemoveColumn_AllColumns_EmptyTable()
     {
         ObservableTable<string> expected = new(
-            new string[] { },
-            new string?[] { },
-            new string?[] { }
+            Array.Empty<string>(),
+            Array.Empty<string>(),
+            Array.Empty<string>()
         );
 
         var actual = Helper.GetSampleTable();

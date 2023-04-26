@@ -4,30 +4,29 @@ namespace UnitTest;
 
 internal static class Extension
 {
-    internal static bool ContentEquals(this ObservableTable<string> operand1, ObservableTable<string> operand2)
+    internal static bool ContentEquals(this ObservableTable<string> a, ObservableTable<string> b)
     {
         // Headers
-        if (!Enumerable.SequenceEqual(operand1.Headers, operand2.Headers))
+        if (!Enumerable.SequenceEqual(a.Headers, b.Headers))
         { return false; }
 
         // Records
-        if (operand1.Records.Count != operand2.Records.Count)
+        if (a.Records.Count != b.Records.Count)
         { return false; }
 
-        for (int i = 0; i < operand1.Records.Count; i++)
+        for (int i = 0; i < a.Records.Count; i++)
         {
-            if (!Enumerable.SequenceEqual(operand1.Records[i], operand2.Records[i]))
+            if (!Enumerable.SequenceEqual(a.Records[i], b.Records[i]))
             { return false; }
         }
         return true;
     }
 
-    internal static bool ContentEquals<T>(this CellEdit<T> operand1, CellEdit<T> operand2)
+    internal static bool ContentEquals<T>(this CellEdit<T> a, CellEdit<T> b)
     {
-        // Headers
-        foreach (var property in operand1.GetType().GetProperties())
+        foreach (var property in a.GetType().GetProperties())
         {
-            if (property.GetValue(operand1) != property.GetValue(operand2))
+            if (property.GetValue(a)?.GetHashCode() != property.GetValue(b)?.GetHashCode())
             { return false; }
         }
         return true;

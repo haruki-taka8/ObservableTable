@@ -53,7 +53,7 @@ public class Redo
         var expected = Helper.GetSampleTable();
         var actual = Helper.GetSampleTable();
 
-        actual.InsertColumn(0, new ColumnDefinition<string>("Test"));
+        actual.InsertColumn(0, new Column<string>("Test"));
         actual.Undo();
         Assert.IsTrue(expected.ContentEquals(actual));
 
@@ -149,7 +149,7 @@ public class Redo
         var expected = Helper.GetSampleTable();
         var actual = Helper.GetSampleTable();
 
-        actual.SetCell(new CellDefinition<string>(0, 0, "Test"));
+        actual.SetCell(new Cell<string>(0, 0, "Test"));
         actual.Undo();
         Assert.IsTrue(expected.ContentEquals(actual));
 

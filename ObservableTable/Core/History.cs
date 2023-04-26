@@ -1,77 +1,84 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 [assembly: InternalsVisibleTo("UnitTest")]
 namespace ObservableTable.Core;
 
-internal enum Change
-{
-    Cell,
-    InsertRow,
-    RemoveRow,
-    InsertColumn,
-    RemoveColumn
-}
-
-internal class EditBase
+internal interface IEdit
 {
     internal int Parity { get; init; }
-    internal Change Change { get; set; }
-    internal virtual EditBase DeepCopy() { return new(); }
 
-    // Unused for CellOperation<T>
+    // Unused for CellEdit<T>
+    internal bool IsInsert { get; set; }
     internal int Index { get; init; }
-    internal virtual void InvertOperation() { }
-}
 
-internal class RowEdit<T> : EditBase
+    public IEdit DeepClone<T>()
     {
-    internal RowDefinition<T> Row { get; init; }
-
-    internal override void InvertOperation()
-    {
-        Change = Change == Change.InsertRow ? Change.RemoveRow : Change.InsertRow;
-    }
-
-    internal override RowEdit<T> DeepCopy() => new(Parity, Index, Change, Row);
-
-    internal RowEdit(int parity, int index, Change change, RowDefinition<T> row)
-    {
-        Parity = parity;
-        Index = index;
-        Change = change;
-        Row = row;
+        if (this is RowEdit<T> row)
+        {
+            return new RowEdit<T>(row.Parity, row.IsInsert, row.Index, row.Values);
+        }
+        if (this is ColumnEdit<T> column)
+        {
+            return new ColumnEdit<T>(column.Parity, column.IsInsert, column.Index, column.Header, column.Values);
+        }
+        var cell = (CellEdit<T>)this;
+        return new CellEdit<T>(cell.Parity, cell.Row, cell.Column, cell.Value);
     }
 }
 
-internal class ColumnEdit<T> : EditBase
-    {
-    internal ColumnDefinition<T> Column { get; init; }
-
-    internal override void InvertOperation()
-    {
-        Change = Change == Change.InsertColumn ? Change.RemoveColumn : Change.InsertColumn;
-    }
-
-    internal override ColumnEdit<T> DeepCopy() => new(Parity, Index, Change, Column);
-
-    internal ColumnEdit(int parity, int index, Change change, ColumnDefinition<T> column)
-    {
-        Parity = parity;
-        Index = index;
-        Change = change;
-        Column = column;
-    }
-}
-
-internal class CellEdit<T> : EditBase
+internal class RowEdit<T> : Row<T>, IEdit
 {
-    internal CellDefinition<T> Cell { get; set; }
+    public int Parity { get; init; }
+    public int Index { get; init; }
+    public bool IsInsert { get; set; }
 
-    internal override CellEdit<T> DeepCopy() => new(Parity, Cell);
-
-    internal CellEdit(int parity, CellDefinition<T> cell)
+    internal RowEdit(int parity, bool isInsert, int index, IList<T?> row) : base(row)
     {
         Parity = parity;
-        Cell = cell;
+        IsInsert = isInsert;
+        Index = index;
+    }
+    internal RowEdit(int parity, bool isInsert, int index, Row<T> row) : this(parity, isInsert, index, row.Values)
+    { }
+}
+
+internal class ColumnEdit<T> : Column<T>, IEdit
+{
+    public int Parity { get; init; }
+    public int Index { get; init; }
+    public bool IsInsert { get; set; }
+
+    internal void DeepCopy(out IEdit edit)
+    {
+        var serialized = JsonSerializer.Serialize(this);
+        edit = JsonSerializer.Deserialize<RowEdit<T>>(serialized) ?? throw new NullReferenceException(serialized);
+    }
+
+    internal ColumnEdit(int parity, bool isInsert, int index, T header, IList<T?> values) : base(header, values)
+    {
+        Parity = parity;
+        IsInsert = isInsert;
+        Index = index;
+    }
+    internal ColumnEdit(int parity, bool isInsert, int index, Column<T> column) : this(parity, isInsert, index, column.Header, column.Values)
+    { }
+}
+
+internal class CellEdit<T> : Cell<T>, IEdit
+{
+    public int Parity { get; init; }
+
+    // Unused members
+    public int Index { get; init; }
+    public bool IsInsert { get; set; }
+
+    internal CellEdit(int parity, int row, int column, T? value) : base(row, column, value)
+    {
+        Parity = parity;
+    }
+    internal CellEdit(int parity, Cell<T> cell) : base(cell.Row, cell.Column, cell.Value)
+    { 
+        Parity = parity;
     }
 }

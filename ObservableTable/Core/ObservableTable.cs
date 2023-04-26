@@ -13,10 +13,10 @@ public class ObservableTable<T>
     public int UndoCount => undo.Count;
     public int RedoCount => redo.Count;
 
-    private ObservableCollection<T> headers { get; } = new();
-    private readonly Stack<EditBase> undo = new();
-    private readonly Stack<EditBase> redo = new();
-    private bool recordTransaction;
+    private readonly ObservableCollection<T> headers = new();
+    private readonly Stack<IEdit> undo = new();
+    private readonly Stack<IEdit> redo = new();
+    private bool recordTransactions;
     private int parity;
 
     // Constructors
@@ -26,7 +26,7 @@ public class ObservableTable<T>
     {
         this.headers = new(headers);
         InsertRow(0, records);
-        recordTransaction = true;
+        recordTransactions = true;
     }
 
     // Methods: Record modifications
@@ -47,7 +47,7 @@ public class ObservableTable<T>
         toAdd.CollectionChanged += RecordChanged;
         Records.Insert(index, toAdd);
 
-        RecordTransaction(new RowEdit<T>(parity, index, Change.InsertRow, new RowDefinition<T>(baseToAdd)));
+        RecordTransaction(new RowEdit<T>(parity, true, index, baseToAdd));
     }
 
     public void RemoveRow(params ObservableCollection<T?>[] rows)
@@ -62,11 +62,11 @@ public class ObservableTable<T>
 
     private void RemoveRow(ObservableCollection<T?> row)
     {
-        RecordTransaction(new RowEdit<T>(parity, Records.IndexOf(row), Change.RemoveRow, new RowDefinition<T>(row)));
+        RecordTransaction(new RowEdit<T>(parity, false, Records.IndexOf(row), row));
         Records.Remove(row);
     }
 
-    public void InsertColumn(int index, params ColumnDefinition<T>[] columns)
+    public void InsertColumn(int index, params Column<T>[] columns)
     {
         parity = columns.Length;
         foreach (var column in columns)
@@ -76,7 +76,7 @@ public class ObservableTable<T>
         }
     }
 
-    private void InsertColumn(int index, ColumnDefinition<T> column)
+    private void InsertColumn(int index, Column<T> column)
     {
         var values = column.Values.PadRight(Records.Count);
 
@@ -87,7 +87,7 @@ public class ObservableTable<T>
 
         headers.Insert(index, column.Header);
 
-        RecordTransaction(new ColumnEdit<T>(parity, index, Change.InsertColumn, column));
+        RecordTransaction(new ColumnEdit<T>(parity, true, index, column));
     }
 
     public void RemoveColumn(params T[] headers)
@@ -106,17 +106,17 @@ public class ObservableTable<T>
         int index = headers.IndexOf(header);
         headers.Remove(header);
 
-        List<T?> removedColumn = new();
+        List<T?> column = new();
         foreach (var record in Records)
         {
-            removedColumn.Add(record[index]);
+            column.Add(record[index]);
             record.RemoveAt(index);
         }
 
-        RecordTransaction(new ColumnEdit<T>(parity, index, Change.RemoveColumn, new ColumnDefinition<T>(header, removedColumn)));
+        RecordTransaction(new ColumnEdit<T>(parity, false, index, header, column));
     }
 
-    public void SetCell(params CellDefinition<T>[] cells)
+    public void SetCell(params Cell<T>[] cells)
     {
         parity = cells.Length;
         foreach (var cell in cells)
@@ -126,7 +126,7 @@ public class ObservableTable<T>
         }
     }
 
-    private void SetCell(CellDefinition<T> cell)
+    private void SetCell(Cell<T> cell)
     {
         // Let RecordChanged record the transcation
         Records[cell.Row][cell.Column] = cell.Value;
@@ -137,77 +137,69 @@ public class ObservableTable<T>
     {
         if (
             e.Action != NotifyCollectionChangedAction.Replace
-            || !recordTransaction
             || sender is null
             || e.OldItems is null
         ) { return; }
 
         // Handles inline changes
-        var newRecord = (ObservableCollection<T?>)sender;
-        var index = Records.IndexOf(newRecord);
-        var oldCell = (T?)e.OldItems[0];
+        var record = (ObservableCollection<T?>)sender;
+        var row = Records.IndexOf(record);
+        var cell = (T?)e.OldItems[0];
 
-        RecordTransaction(new CellEdit<T>(parity, new(index, e.OldStartingIndex, oldCell)));
+        RecordTransaction(new CellEdit<T>(parity, row, e.OldStartingIndex, cell));
     }
 
-    internal void RecordTransaction(EditBase operation)
+    private void RecordTransaction(IEdit operation)
     {
-        if (!recordTransaction) { return; }
+        if (!recordTransactions) { return; }
         undo.Push(operation);
         redo.Clear();
     }
 
-    internal CellEdit<T> UpdateCellOperation(CellEdit<T> operation)
+    internal IEdit UpdateCellEdit(IEdit edit)
     {
-        var old = operation.Cell;
-        operation.Cell = new(old.Row, old.Column, Records[old.Row][old.Column]);
-        return operation;
+        if (edit is not CellEdit<T> cellEdit) { return edit; }
+
+        cellEdit.Value = Records[cellEdit.Row][cellEdit.Column];
+        return cellEdit;
     }
 
-    private void RevertHistory(EditBase operation)
+    private void RevertHistory(IEdit edit)
     {
-        recordTransaction = false;
-
-        switch (operation.Change)
+        recordTransactions = false;
+        switch (edit)
         {
-            case Change.InsertRow:
-                var row = (RowEdit<T>)operation;
-                Records.Insert(row.Index, new(row.Row.Values));
+            case RowEdit<T> row when edit.IsInsert:
+                Records.Insert(row.Index, new(row.Values));
                 break;
 
-            case Change.RemoveRow:
-                Records.RemoveAt(operation.Index);
+            case RowEdit<T> row:
+                Records.RemoveAt(row.Index);
                 break;
 
-            case Change.InsertColumn:
-                var column = (ColumnEdit<T>)operation;
-                InsertColumn(column.Index, column.Column);
+            case ColumnEdit<T> column when edit.IsInsert:
+                InsertColumn(column.Index, new Column<T>(column.Header, column.Values));
                 break;
 
-            case Change.RemoveColumn:
-                column = (ColumnEdit<T>)operation;
-                RemoveColumn(column.Column.Header);
+            case ColumnEdit<T> column:
+                RemoveColumn(column.Header);
                 break;
 
-            case Change.Cell:
-                var cell = (CellEdit<T>)operation;
-                SetCell(cell.Cell);
+            case CellEdit<T> cell:
+                SetCell(cell);
                 break;
         }
-        recordTransaction = true;
+        recordTransactions = true;
     }
 
     public void Undo()
     {
         if (undo.Count == 0) { return; }
 
-        EditBase last = undo.Pop();
+        var last = undo.Pop();
+        redo.Push(UpdateCellEdit(last.DeepClone<T>()));
 
-        var toPush = last.DeepCopy();
-        if (last.Change == Change.Cell) { toPush = UpdateCellOperation((CellEdit<T>)toPush); }
-        redo.Push(toPush);
-
-        last.InvertOperation();
+        last.IsInsert = !last.IsInsert;
         RevertHistory(last);
 
         if (undo.Count == 0) { return; }
@@ -218,11 +210,8 @@ public class ObservableTable<T>
     {
         if (redo.Count == 0) { return; }
 
-        EditBase last = redo.Pop();
-
-        var toPush = last.DeepCopy();
-        if (last.Change == Change.Cell) { toPush = UpdateCellOperation((CellEdit<T>)toPush); }
-        undo.Push(toPush);
+        var last = redo.Pop();
+        undo.Push(UpdateCellEdit(last.DeepClone<T>()));
 
         RevertHistory(last);
 

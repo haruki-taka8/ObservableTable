@@ -10,7 +10,7 @@ public class SetCell
     {
         var actual = Helper.GetSampleTable();
         Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
-            actual.SetCell(new CellDefinition<string>(-1, 0, "Test"))
+            actual.SetCell(new Cell<string>(-1, 0, "Test"))
         );
     }
 
@@ -19,7 +19,7 @@ public class SetCell
     {
         var actual = Helper.GetSampleTable();
         Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
-            actual.SetCell(new CellDefinition<string>(0, -1, "Test"))
+            actual.SetCell(new Cell<string>(0, -1, "Test"))
         );
     }
 
@@ -28,7 +28,7 @@ public class SetCell
     {
         var actual = Helper.GetSampleTable();
         Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
-            actual.SetCell(new CellDefinition<string>(100, 0, "Test"))
+            actual.SetCell(new Cell<string>(100, 0, "Test"))
         );
     }
 
@@ -37,7 +37,7 @@ public class SetCell
     {
         var actual = Helper.GetSampleTable();
         Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
-            actual.SetCell(new CellDefinition<string>(0, 100, "Test"))
+            actual.SetCell(new Cell<string>(0, 100, "Test"))
         );
     }
 
@@ -51,7 +51,7 @@ public class SetCell
         );
 
         var actual = Helper.GetSampleTable();
-        actual.SetCell(new CellDefinition<string>(0, 0, "Test"));
+        actual.SetCell(new Cell<string>(0, 0, "Test"));
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
@@ -71,6 +71,15 @@ public class SetCell
             new(1, 1, "Test2")
         );
 
+        Assert.IsTrue(expected.ContentEquals(actual));
+    }
+
+    [TestMethod]
+    public void SetCell_Nothing_Nothing()
+    {
+        var expected = Helper.GetSampleTable();
+        var actual = Helper.GetSampleTable();
+        actual.SetCell();
         Assert.IsTrue(expected.ContentEquals(actual));
     }
 }

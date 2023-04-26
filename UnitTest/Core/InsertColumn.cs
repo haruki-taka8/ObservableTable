@@ -10,7 +10,7 @@ public class InsertColumn
     {
         var actual = Helper.GetSampleTable();
         Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
-            actual.InsertColumn(-1, new ColumnDefinition<string>("D0"))
+            actual.InsertColumn(-1, new Column<string>("D0"))
         );
     }
 
@@ -24,7 +24,7 @@ public class InsertColumn
         );
 
         var actual = Helper.GetSampleTable();
-        actual.InsertColumn(0, new ColumnDefinition<string>("D0"));
+        actual.InsertColumn(0, new Column<string>("D0"));
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
@@ -39,7 +39,7 @@ public class InsertColumn
         );
 
         var actual = Helper.GetSampleTable();
-        actual.InsertColumn(actual.Headers.Count, new ColumnDefinition<string>("D0"));
+        actual.InsertColumn(actual.Headers.Count, new Column<string>("D0"));
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
@@ -49,7 +49,7 @@ public class InsertColumn
     {
         var actual = Helper.GetSampleTable();
         Assert.ThrowsException<ArgumentOutOfRangeException>(() =>
-            actual.InsertColumn(actual.Headers.Count + 1, new ColumnDefinition<string>("D0"))
+            actual.InsertColumn(actual.Headers.Count + 1, new Column<string>("D0"))
         );
     }
 
@@ -76,7 +76,7 @@ public class InsertColumn
     {
         var actual = Helper.GetSampleTable();
         Assert.ThrowsException<ArgumentException>(() =>
-            actual.InsertColumn(0, new ColumnDefinition<string>("D0", new string[] { "D1", "D2", "D3" }))
+            actual.InsertColumn(0, new Column<string>("D0", new string[] { "D1", "D2", "D3" }))
         );
     }
 
