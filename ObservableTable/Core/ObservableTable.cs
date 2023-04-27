@@ -158,6 +158,7 @@ public class ObservableTable<T>
 
     internal IEdit UpdateCellEdit(IEdit edit)
     {
+        edit = edit.DeepClone<T>();
         if (edit is not CellEdit<T> cellEdit) { return edit; }
 
         cellEdit.Value = Records[cellEdit.Row][cellEdit.Column];
@@ -178,7 +179,7 @@ public class ObservableTable<T>
                 break;
 
             case ColumnEdit<T> column when edit.IsInsert:
-                InsertColumn(column.Index, new Column<T>(column.Header, column.Values));
+                InsertColumn(column.Index, column);
                 break;
 
             case ColumnEdit<T> column:
@@ -197,7 +198,7 @@ public class ObservableTable<T>
         if (undo.Count == 0) { return; }
 
         var last = undo.Pop();
-        redo.Push(UpdateCellEdit(last.DeepClone<T>()));
+        redo.Push(UpdateCellEdit(last));
 
         last.IsInsert = !last.IsInsert;
         RevertHistory(last);
@@ -211,7 +212,7 @@ public class ObservableTable<T>
         if (redo.Count == 0) { return; }
 
         var last = redo.Pop();
-        undo.Push(UpdateCellEdit(last.DeepClone<T>()));
+        undo.Push(UpdateCellEdit(last));
 
         RevertHistory(last);
 
