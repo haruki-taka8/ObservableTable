@@ -20,7 +20,10 @@ public class ObservableTable<T>
     private int parity;
 
     // Constructors
-    public ObservableTable() { }
+    public ObservableTable() 
+    {
+        recordTransactions = true;    
+    }
 
     public ObservableTable(IEnumerable<T> headers, params IList<T?>[] records)
     {
