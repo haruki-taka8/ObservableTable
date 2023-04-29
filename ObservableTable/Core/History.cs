@@ -16,7 +16,7 @@ internal interface IEdit
     {
         if (this is RowEdit<T> row)
         {
-            return new RowEdit<T>(row.Parity, row.IsInsert, row.Index, row.Values);
+            return new RowEdit<T>(row.Parity, row.IsInsert, row.Index, row);
         }
         if (this is ColumnEdit<T> column)
         {
@@ -39,8 +39,6 @@ internal class RowEdit<T> : Row<T>, IEdit
         IsInsert = isInsert;
         Index = index;
     }
-    internal RowEdit(int parity, bool isInsert, int index, Row<T> row) : this(parity, isInsert, index, row.Values)
-    { }
 }
 
 internal class ColumnEdit<T> : Column<T>, IEdit

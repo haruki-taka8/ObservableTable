@@ -1,4 +1,6 @@
-﻿namespace ObservableTable.Core;
+﻿using System.Collections.ObjectModel;
+
+namespace ObservableTable.Core;
 
 public class Column<T>
 {
@@ -17,19 +19,11 @@ public class Column<T>
     }
 }
 
-public class Row<T>
+public class Row<T> : Collection<T?>, IList<T?>
 {
-    public IList<T?> Values { get; init; }
-
-    public Row()
-    {
-        Values = new List<T?>();
+    public Row() : base() { }
+    public Row(IList<T?> values) : base(values) { }
     }
-    public Row(IList<T?> values)
-    {
-        Values = values;
-    }
-}
 
 public class Cell<T>
 {
