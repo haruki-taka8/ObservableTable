@@ -23,7 +23,7 @@ internal interface IEdit
             return new ColumnEdit<T>(column.Parity, column.IsInsert, column.Index, column);
         }
         var cell = (CellEdit<T>)this;
-        return new CellEdit<T>(cell.Parity, cell.Row, cell.Column, cell.Value);
+        return new CellEdit<T>(cell.Parity, cell);
     }
 }
 
@@ -65,11 +65,11 @@ internal class CellEdit<T> : Cell<T>, IEdit
     public int Index { get; init; }
     public bool IsInsert { get; set; }
 
-    internal CellEdit(int parity, int row, int column, T? value) : base(row, column, value)
+    internal CellEdit(int parity, int rowIndex, int columnIndex, T? value) : base(rowIndex, columnIndex, value)
     {
         Parity = parity;
     }
-    internal CellEdit(int parity, Cell<T> cell) : base(cell.Row, cell.Column, cell.Value)
+    internal CellEdit(int parity, Cell<T> cell) : base(cell.RowIndex, cell.ColumnIndex, cell.Value)
     { 
         Parity = parity;
     }

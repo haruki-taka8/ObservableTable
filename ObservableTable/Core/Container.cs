@@ -23,18 +23,18 @@ public class Row<T> : Collection<T?>, IList<T?>
 {
     public Row() : base() { }
     public Row(IList<T?> values) : base(values) { }
-    }
+}
 
 public class Cell<T>
 {
-    public int Row { get; init; }
-    public int Column { get; init; }
+    public int RowIndex { get; init; }
+    public int ColumnIndex { get; init; }
     public T? Value { get; set; }
 
-    public Cell(int row, int column, T? value)
+    public Cell(int rowIndex, int columnIndex, T? value)
     {
-        Row = row;
-        Column = column;
+        RowIndex = rowIndex;
+        ColumnIndex = columnIndex;
         Value = value;
     }
 }
