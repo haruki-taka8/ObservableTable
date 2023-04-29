@@ -45,12 +45,12 @@ public class ObservableTable<T>
 
     private void InsertRow(int index, IList<T?> row)
     {
-        IList<T?> baseToAdd = row.PadRight(headers.Count);
-        ObservableCollection<T?> toAdd = new(baseToAdd);
+        row = row.PadRight(headers.Count);
+        ObservableCollection<T?> toAdd = new(row);
         toAdd.CollectionChanged += RecordChanged;
         Records.Insert(index, toAdd);
 
-        RecordTransaction(new RowEdit<T>(parity, true, index, baseToAdd));
+        RecordTransaction(new RowEdit<T>(parity, true, index, row));
     }
 
     public void RemoveRow(params ObservableCollection<T?>[] rows)
@@ -132,7 +132,7 @@ public class ObservableTable<T>
     private void SetCell(Cell<T> cell)
     {
         // Let RecordChanged record the transcation
-        Records[cell.Row][cell.Column] = cell.Value;
+        Records[cell.RowIndex][cell.ColumnIndex] = cell.Value;
     }
 
     // Methods: History
@@ -164,7 +164,7 @@ public class ObservableTable<T>
         edit = edit.DeepClone<T>();
         if (edit is not CellEdit<T> cellEdit) { return edit; }
 
-        cellEdit.Value = Records[cellEdit.Row][cellEdit.Column];
+        cellEdit.Value = Records[cellEdit.RowIndex][cellEdit.ColumnIndex];
         return cellEdit;
     }
 
@@ -174,7 +174,7 @@ public class ObservableTable<T>
         switch (edit)
         {
             case RowEdit<T> row when edit.IsInsert:
-                Records.Insert(row.Index, new(row.Values));
+                Records.Insert(row.Index, new(row));
                 break;
 
             case RowEdit<T> row:

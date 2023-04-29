@@ -35,7 +35,7 @@ public class UpdateCellEdit
     public void UpdateCellEdit_RowEdit_Original()
     {
         var table = Helper.GetSampleTable();
-        RowEdit<string> actual = new(0, true, 0, new Row<string>());
+        RowEdit<string> actual = new(0, true, 0, new List<string?>());
         var output = table.UpdateCellEdit(actual);
 
         Assert.IsTrue(output is RowEdit<string>); // Type
