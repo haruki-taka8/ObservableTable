@@ -84,6 +84,19 @@ public class Undo
     }
 
     [TestMethod]
+    public void Undo_RenameColumn_OperationReverted()
+    {
+        var expected = Helper.GetSampleTable();
+        var actual = Helper.GetSampleTable();
+
+        actual.RenameColumn(0, "D0");
+        Assert.IsFalse(expected.ContentEquals(actual));
+
+        actual.Undo();
+        Assert.IsTrue(expected.ContentEquals(actual));
+    }
+
+    [TestMethod]
     public void Undo_RemoveRows_OperationsReverted()
     {
         var expected = Helper.GetSampleTable();

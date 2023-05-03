@@ -1,5 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
-using System.Text.Json;
 
 [assembly: InternalsVisibleTo("UnitTest")]
 namespace ObservableTable.Core;
@@ -17,6 +16,10 @@ internal interface IEdit
         if (this is RowEdit<T> row)
         {
             return new RowEdit<T>(row.Parity, row.IsInsert, row.Index, row);
+        }
+        if (this is ColumnRenameEdit<T> rename)
+        {
+            return new ColumnRenameEdit<T>(rename.Parity, rename.Index, rename.Header);
         }
         if (this is ColumnEdit<T> column)
         {
@@ -55,6 +58,23 @@ internal class ColumnEdit<T> : Column<T>, IEdit
     }
     internal ColumnEdit(int parity, bool isInsert, int index, Column<T> column) : this(parity, isInsert, index, column.Header, column.Values)
     { }
+}
+
+internal class ColumnRenameEdit<T> : IEdit
+{
+    public int Parity { get; init; }
+    public int Index { get; init; }
+    public T Header { get; set; }
+
+    // Unused members
+    public bool IsInsert { get; set; }
+
+    internal ColumnRenameEdit(int parity, int index, T header)
+    {
+        Parity = parity;
+        Index = index;
+        Header = header;
+    }
 }
 
 internal class CellEdit<T> : Cell<T>, IEdit

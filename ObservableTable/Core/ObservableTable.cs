@@ -69,6 +69,12 @@ public class ObservableTable<T>
         Records.Remove(row);
     }
 
+    public void RenameColumn(int index, T header)
+    {
+        RecordTransaction(new ColumnRenameEdit<T>(parity, index, headers[index]));
+        headers[index] = header;
+    }
+
     public void InsertColumn(int index, params Column<T>[] columns)
     {
         parity = columns.Length;
@@ -162,10 +168,20 @@ public class ObservableTable<T>
     internal IEdit UpdateCellEdit(IEdit edit)
     {
         edit = edit.DeepClone<T>();
-        if (edit is not CellEdit<T> cellEdit) { return edit; }
 
-        cellEdit.Value = Records[cellEdit.RowIndex][cellEdit.ColumnIndex];
-        return cellEdit;
+        if (edit is ColumnRenameEdit<T> renameEdit)
+        {
+            renameEdit.Header = Headers[renameEdit.Index];
+            return renameEdit;
+        }
+
+        if (edit is CellEdit<T> cellEdit)
+        {
+            cellEdit.Value = Records[cellEdit.RowIndex][cellEdit.ColumnIndex];
+            return cellEdit;
+        }
+
+        return edit;
     }
 
     private void RevertHistory(IEdit edit)
@@ -179,6 +195,10 @@ public class ObservableTable<T>
 
             case RowEdit<T> row:
                 Records.RemoveAt(row.Index);
+                break;
+
+            case ColumnRenameEdit<T> column:
+                RenameColumn(column.Index, column.Header);
                 break;
 
             case ColumnEdit<T> column when edit.IsInsert:

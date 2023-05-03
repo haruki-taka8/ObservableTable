@@ -104,6 +104,20 @@ public class Redo
     }
 
     [TestMethod]
+    public void Redo_RenameColumn_OperationsReverted()
+    {
+        var expected = Helper.GetSampleTable();
+        var actual = Helper.GetSampleTable();
+
+        actual.RenameColumn(0, "D0");
+        actual.Undo();
+        Assert.IsTrue(expected.ContentEquals(actual));
+
+        actual.Redo();
+        Assert.IsFalse(expected.ContentEquals(actual));
+    }
+
+    [TestMethod]
     public void Redo_InsertColumns_OperationsReverted()
     {
         var expected = Helper.GetSampleTable();
