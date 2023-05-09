@@ -12,6 +12,7 @@ public class ObservableTable<T>
     public ReadOnlyObservableCollection<T> Headers => new(headers);
     public int UndoCount => undo.Count;
     public int RedoCount => redo.Count;
+    public event EventHandler? TableModified;
 
     private readonly ObservableCollection<T> headers = new();
     private readonly Stack<IEdit> undo = new();
@@ -22,7 +23,7 @@ public class ObservableTable<T>
     // Constructors
     public ObservableTable() 
     {
-        recordTransactions = true;    
+        recordTransactions = true;
     }
 
     public ObservableTable(IEnumerable<T> headers, params IList<T?>[] records)
@@ -163,6 +164,9 @@ public class ObservableTable<T>
         if (!recordTransactions) { return; }
         undo.Push(operation);
         redo.Clear();
+
+        if (TableModified is null) { return; }
+        TableModified(this, new());
     }
 
     internal IEdit UpdateCellEdit(IEdit edit)
