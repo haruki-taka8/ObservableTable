@@ -66,8 +66,9 @@ public class ObservableTable<T>
 
     private void RemoveRow(ObservableCollection<T?> row)
     {
-        RecordTransaction(new RowEdit<T>(parity, false, Records.IndexOf(row), row));
+        int index = Records.IndexOf(row);
         Records.Remove(row);
+        RecordTransaction(new RowEdit<T>(parity, false, index, row));
     }
 
     public void RenameColumn(int index, T header)
@@ -161,12 +162,11 @@ public class ObservableTable<T>
 
     private void RecordTransaction(IEdit operation)
     {
+        TableModified?.Invoke(this, new());
+
         if (!recordTransactions) { return; }
         undo.Push(operation);
         redo.Clear();
-
-        if (TableModified is null) { return; }
-        TableModified(this, new());
     }
 
     internal IEdit UpdateCellEdit(IEdit edit)
@@ -195,10 +195,12 @@ public class ObservableTable<T>
         {
             case RowEdit<T> row when edit.IsInsert:
                 Records.Insert(row.Index, new(row));
+                TableModified?.Invoke(this, new());
                 break;
 
             case RowEdit<T> row:
                 Records.RemoveAt(row.Index);
+                TableModified?.Invoke(this, new());
                 break;
 
             case ColumnRenameEdit<T> column:
