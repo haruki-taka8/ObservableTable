@@ -66,8 +66,9 @@ public class ObservableTable<T>
 
     private void RemoveRow(ObservableCollection<T?> row)
     {
-        RecordTransaction(new RowEdit<T>(parity, false, Records.IndexOf(row), row));
+        int index = Records.IndexOf(row);
         Records.Remove(row);
+        RecordTransaction(new RowEdit<T>(parity, false, index, row));
     }
 
     public void RenameColumn(int index, T header)
