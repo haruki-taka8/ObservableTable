@@ -162,12 +162,11 @@ public class ObservableTable<T>
 
     private void RecordTransaction(IEdit operation)
     {
+        TableModified?.Invoke(this, new());
+
         if (!recordTransactions) { return; }
         undo.Push(operation);
         redo.Clear();
-
-        if (TableModified is null) { return; }
-        TableModified(this, new());
     }
 
     internal IEdit UpdateCellEdit(IEdit edit)
@@ -196,10 +195,12 @@ public class ObservableTable<T>
         {
             case RowEdit<T> row when edit.IsInsert:
                 Records.Insert(row.Index, new(row));
+                TableModified?.Invoke(this, new());
                 break;
 
             case RowEdit<T> row:
                 Records.RemoveAt(row.Index);
+                TableModified?.Invoke(this, new());
                 break;
 
             case ColumnRenameEdit<T> column:
