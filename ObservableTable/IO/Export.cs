@@ -14,20 +14,40 @@ public static class Exporter
     public static string ToCsvString(ObservableTable<string> table, bool hasHeader = true)
     {
         StringBuilder builder = new();
-        if (hasHeader) { builder.AppendLine(ConcatenateList((IList<string?>)table.Headers)); }
+
+        if (hasHeader)
+        { 
+            builder.AppendLine(ConcatenateList((IList<string?>)table.Headers));
+        }
 
         foreach (var record in table.Records)
         {
             builder.AppendLine(ConcatenateList(record));
         }
+
         return builder.ToString().Trim();
+    }
+
+    public static IEnumerable<string> ToCsvStringEnumerable(ObservableTable<string> table, bool hasHeader)
+    {
+        List<string> output = new();
+
+        if (hasHeader)
+        {
+            output.Add(ConcatenateList((IList<string?>)table.Headers));
+        }
+
+        foreach (var record in table.Records)
+        {
+            output.Add(ConcatenateList(record));
+        }
+
+        return output;
     }
 
     public static void ToFile(string path, ObservableTable<string> table, bool hasHeader = true)
     {
-        string csvString = ToCsvString(table, hasHeader);
-
-        using StreamWriter writer = new(path);
-        writer.WriteLine(csvString);
+        var content = ToCsvString(table, hasHeader);
+        File.WriteAllText(path, content);
     }
 }
