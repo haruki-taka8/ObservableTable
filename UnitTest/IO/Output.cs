@@ -19,6 +19,12 @@ public class Output
         Assert.AreEqual(expectedTableString, actualTableString, false);
     }
 
+    private static void AssertTableEnumerable(IEnumerable<string> actualTableString)
+    {
+        var joined = string.Join(Environment.NewLine, actualTableString);
+        Assert.AreEqual(expectedTableString, joined, false);
+    }
+
     [TestMethod]
     public void ToCsvString_Quoted_HasHeaders()
     {
@@ -101,6 +107,94 @@ public class Output
 
         Assert.IsTrue(
             string.IsNullOrEmpty(actualTableString),
+            string.Format("Expected string \"\"; got {0}", actualTableString)
+        );
+    }
+
+    [TestMethod]
+    public void ToCsvStringEnumerable_Quoted_HasHeaders()
+    {
+        var table = Importer.FromFilePath(CsvFolder + "Quoted.csv", true);
+
+        var actualTableString = Exporter.ToCsvStringEnumerable(table, true);
+
+        AssertTableEnumerable(actualTableString);
+    }
+
+    [TestMethod]
+    public void ToCsvStringEnumerable_Quoted_HasNoHeaders()
+    {
+        var table = Importer.FromFilePath(CsvFolder + "Quoted.csv", false);
+
+        var actualTableString = Exporter.ToCsvStringEnumerable(table, false);
+
+        AssertTableEnumerable(actualTableString);
+    }
+
+    [TestMethod]
+    public void ToCsvStringEnumerable_Unquoted_HasHeaders()
+    {
+        var table = Importer.FromFilePath(CsvFolder + "Unquoted.csv", true);
+
+        var actualTableString = Exporter.ToCsvString(table, true);
+
+        AssertTable(actualTableString);
+    }
+
+    [TestMethod]
+    public void ToCsvStringEnumerable_Unquoted_HasNoHeaders()
+    {
+        var table = Importer.FromFilePath(CsvFolder + "Unquoted.csv", false);
+
+        var actualTableString = Exporter.ToCsvStringEnumerable(table, false);
+
+        AssertTableEnumerable(actualTableString);
+    }
+
+    [TestMethod]
+    public void ToCsvStringEnumerable_Single_HasHeaders()
+    {
+        var table = Importer.FromFilePath(CsvFolder + "Single.csv", true);
+
+        var actualTableString = Exporter.ToCsvStringEnumerable(table, true);
+
+        Assert.IsTrue(actualTableString.Any());
+        Assert.AreEqual(FirstRowInCsvFile, actualTableString.First(), false);
+    }
+
+    [TestMethod]
+    public void ToCsvStringEnumerable_Single_HasNoHeaders()
+    {
+        var table = Importer.FromFilePath(CsvFolder + "Single.csv", false);
+
+        var actualTableString = Exporter.ToCsvStringEnumerable(table, false);
+
+        Assert.IsTrue(actualTableString.Any());
+        Assert.AreEqual(FirstRowInCsvFile, actualTableString.First(), false);
+    }
+
+    [TestMethod]
+    public void ToCsvStringEnumerable_Empty_HasHeaders()
+    {
+        var table = Importer.FromFilePath(CsvFolder + "Empty.csv", true);
+
+        var actualTableString = Exporter.ToCsvStringEnumerable(table, true);
+
+        Assert.IsTrue(
+            string.IsNullOrEmpty(string.Join(Environment.NewLine, actualTableString)),
+            string.Format("Expected string \"\"; got {0}", actualTableString)
+        );
+    }
+
+    [TestMethod]
+    public void ToCsvStringEnumerable_Empty_HasNoHeaders()
+    {
+        var table = Importer.FromFilePath(CsvFolder + "Empty.csv", false);
+
+        var actualTableString = Exporter.ToCsvStringEnumerable(table, false);
+
+        Assert.IsTrue(
+            string.IsNullOrEmpty(string.Join(Environment.NewLine, actualTableString)),
             string.Format("Expected string \"\"; got {0}", actualTableString)
         );
     }
