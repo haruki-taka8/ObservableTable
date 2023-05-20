@@ -9,7 +9,8 @@ internal static class Extension
             throw new ArgumentException("Input list longer than desired resultant length", nameof(list));
         }
 
-        var padding = Enumerable.Repeat<T?>(default, resultantLength - list.Count);
-        return list.Concat(padding).ToList();
+        var output = new T?[resultantLength];
+        list.CopyTo(output, 0);
+        return output;
     }
 }
