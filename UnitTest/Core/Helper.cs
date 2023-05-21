@@ -12,4 +12,16 @@ internal static class Helper
             new string?[] { "A2", "B2", "C2" }
         );
     }
+
+    internal static ObservableTable<string> GetLongSampleTable()
+    {
+        return new ObservableTable<string>(
+            new string[] { "A0", "B0", "C0" },
+            new string?[] { "A1", "B1", "C1" },
+            new string?[] { "A2", "B2", "C2" },
+            new string?[] { "A3", "B3", "C3" },
+            new string?[] { "A4", "B4", "C4" },
+            new string?[] { "A5", "B5", "C5" }
+        );
+    }
 }

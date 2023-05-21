@@ -11,22 +11,9 @@ internal interface IEdit
     internal bool IsInsert { get; set; }
     internal int Index { get; init; }
 
-    public IEdit DeepClone<T>()
+    public IEdit DeepClone()
     {
-        if (this is RowEdit<T> row)
-        {
-            return new RowEdit<T>(row.Parity, row.IsInsert, row.Index, row);
-        }
-        if (this is ColumnRenameEdit<T> rename)
-        {
-            return new ColumnRenameEdit<T>(rename.Parity, rename.Index, rename.Header);
-        }
-        if (this is ColumnEdit<T> column)
-        {
-            return new ColumnEdit<T>(column.Parity, column.IsInsert, column.Index, column);
-        }
-        var cell = (CellEdit<T>)this;
-        return new CellEdit<T>(cell.Parity, cell);
+        throw new NotImplementedException();
     }
 }
 
@@ -41,6 +28,11 @@ internal class RowEdit<T> : Row<T>, IEdit
         Parity = parity;
         IsInsert = isInsert;
         Index = index;
+    }
+
+    IEdit IEdit.DeepClone()
+    {
+        return new RowEdit<T>(Parity, IsInsert, Index, this);
     }
 }
 
@@ -58,6 +50,11 @@ internal class ColumnEdit<T> : Column<T>, IEdit
     }
     internal ColumnEdit(int parity, bool isInsert, int index, Column<T> column) : this(parity, isInsert, index, column.Header, column.Values)
     { }
+
+    IEdit IEdit.DeepClone()
+    {
+        return new ColumnEdit<T>(Parity, IsInsert, Index, Header, Values);
+    }
 }
 
 internal class ColumnRenameEdit<T> : IEdit
@@ -74,6 +71,11 @@ internal class ColumnRenameEdit<T> : IEdit
         Parity = parity;
         Index = index;
         Header = header;
+    }
+
+    IEdit IEdit.DeepClone()
+    {
+        return new ColumnRenameEdit<T>(Parity, Index, Header);
     }
 }
 
@@ -92,5 +94,36 @@ internal class CellEdit<T> : Cell<T>, IEdit
     internal CellEdit(int parity, Cell<T> cell) : base(cell.RowIndex, cell.ColumnIndex, cell.Value)
     { 
         Parity = parity;
+    }
+
+    IEdit IEdit.DeepClone()
+    {
+        return new CellEdit<T>(Parity, this);
+    }
+}
+
+internal class ReorderEdit<T> : IEdit
+{
+    public int Parity { get; init; }
+    public int OldIndex { get; init; }
+    public int NewIndex { get; init; }
+    public bool IsColumn { get; init; }
+    public bool IsUndo { get; set; }
+
+    // Unused members
+    public int Index { get; init; }
+    public bool IsInsert { get; set; }
+
+    internal ReorderEdit(int parity, int oldIndex, int newIndex, bool isColumn)
+    {
+        Parity = parity;
+        OldIndex = oldIndex;
+        NewIndex = newIndex;
+        IsColumn = isColumn;
+    }
+
+    IEdit IEdit.DeepClone()
+    {
+        return new ReorderEdit<T>(Parity, OldIndex, NewIndex, IsColumn);
     }
 }

@@ -71,6 +71,25 @@ public class ObservableTable<T>
         RecordTransaction(new RowEdit<T>(parity, false, index, row));
     }
 
+    public void ReorderRow(int oldIndex, int newIndex)
+    {        
+        Records.Move(oldIndex, newIndex);
+        RecordTransaction(new ReorderEdit<T>(parity, oldIndex, newIndex, false));
+    }
+
+    public void ReorderColumn(int oldIndex, int newIndex)
+    {
+        headers.Move(oldIndex, newIndex);
+
+        foreach (var record in Records)
+        {
+            T? item = record[oldIndex];
+            record.RemoveAt(oldIndex);
+            record.Insert(newIndex, item);
+        }
+        RecordTransaction(new ReorderEdit<T>(parity, oldIndex, newIndex, true));
+    }
+
     public void RenameColumn(int index, T header)
     {
         RecordTransaction(new ColumnRenameEdit<T>(parity, index, headers[index]));
@@ -171,7 +190,7 @@ public class ObservableTable<T>
 
     internal IEdit UpdateCellEdit(IEdit edit)
     {
-        edit = edit.DeepClone<T>();
+        edit = edit.DeepClone();
 
         if (edit is ColumnRenameEdit<T> renameEdit)
         {
@@ -183,6 +202,12 @@ public class ObservableTable<T>
         {
             cellEdit.Value = Records[cellEdit.RowIndex][cellEdit.ColumnIndex];
             return cellEdit;
+        }
+
+        if (edit is ReorderEdit<T> reorderEdit)
+        {
+            reorderEdit.IsUndo = !reorderEdit.IsUndo;
+            return reorderEdit;
         }
 
         return edit;
@@ -213,6 +238,22 @@ public class ObservableTable<T>
 
             case ColumnEdit<T> column:
                 RemoveColumn(column.Header);
+                break;
+
+            case ReorderEdit<T> reorder when reorder.IsColumn && reorder.IsUndo:
+                ReorderColumn(reorder.NewIndex, reorder.OldIndex);
+                break;
+
+            case ReorderEdit<T> reorder when reorder.IsColumn:
+                ReorderColumn(reorder.OldIndex, reorder.NewIndex);
+                break;
+
+            case ReorderEdit<T> reorder when reorder.IsUndo:
+                ReorderRow(reorder.NewIndex, reorder.OldIndex);
+                break;
+
+            case ReorderEdit<T> reorder:
+                ReorderRow(reorder.OldIndex, reorder.NewIndex);
                 break;
 
             case CellEdit<T> cell:
