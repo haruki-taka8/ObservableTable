@@ -21,27 +21,35 @@ public class ObservableTable<T>
     private int parity;
 
     // Constructors
-    public ObservableTable() 
+    public ObservableTable()
     {
         recordTransactions = true;
     }
 
-    public ObservableTable(IEnumerable<T> headers, params IList<T?>[] records)
+    public ObservableTable(IEnumerable<T> headers, IEnumerable<IList<T?>> records)
     {
         this.headers = new(headers);
         InsertRow(0, records);
         recordTransactions = true;
     }
 
+    public ObservableTable(IEnumerable<T> headers, params IList<T?>[] records) : this(headers, records.ToList())
+    { }
+
     // Methods: Record modifications
-    public void InsertRow(int index, params IList<T?>[] rows)
+    public void InsertRow(int index, IEnumerable<IList<T?>> rows)
     {
-        parity = rows.Length;
+        parity = rows.Count();
         foreach (var row in rows)
         {
             parity--;
             InsertRow(index++, row);
         }
+    }
+
+    public void InsertRow(int index, params IList<T?>[] rows)
+    {
+        InsertRow(index, rows.ToList());
     }
 
     private void InsertRow(int index, IList<T?> row)
@@ -54,14 +62,19 @@ public class ObservableTable<T>
         RecordTransaction(new RowEdit<T>(parity, true, index, row));
     }
 
-    public void RemoveRow(params ObservableCollection<T?>[] rows)
+    public void RemoveRow(IEnumerable<ObservableCollection<T?>> rows)
     {
-        parity = rows.Length;
+        parity = rows.Count();
         foreach (var row in rows)
         {
             parity--;
             RemoveRow(row);
         }
+    }
+
+    public void RemoveRow(params ObservableCollection<T?>[] rows)
+    {
+        RemoveRow(rows.ToList());
     }
 
     private void RemoveRow(ObservableCollection<T?> row)
@@ -72,7 +85,7 @@ public class ObservableTable<T>
     }
 
     public void ReorderRow(int oldIndex, int newIndex)
-    {        
+    {
         Records.Move(oldIndex, newIndex);
         RecordTransaction(new ReorderEdit<T>(parity, oldIndex, newIndex, false));
     }
@@ -96,14 +109,19 @@ public class ObservableTable<T>
         headers[index] = header;
     }
 
-    public void InsertColumn(int index, params Column<T>[] columns)
+    public void InsertColumn(int index, IEnumerable<Column<T>> columns)
     {
-        parity = columns.Length;
+        parity = columns.Count();
         foreach (var column in columns)
         {
             parity--;
             InsertColumn(index++, column);
         }
+    }
+
+    public void InsertColumn(int index, params Column<T>[] columns)
+    {
+        InsertColumn(index, columns.ToList());
     }
 
     private void InsertColumn(int index, Column<T> column)
@@ -120,14 +138,19 @@ public class ObservableTable<T>
         RecordTransaction(new ColumnEdit<T>(parity, true, index, column));
     }
 
-    public void RemoveColumn(params T[] headers)
+    public void RemoveColumn(IEnumerable<T> headers)
     {
-        parity = headers.Length;
+        parity = headers.Count();
         foreach (var header in headers)
         {
             parity--;
             RemoveColumn(header);
         }
+    }
+
+    public void RemoveColumn(params T[] headers)
+    {
+        RemoveColumn(headers.ToList());
     }
 
     private void RemoveColumn(T header)
@@ -146,14 +169,19 @@ public class ObservableTable<T>
         RecordTransaction(new ColumnEdit<T>(parity, false, index, header, column));
     }
 
-    public void SetCell(params Cell<T>[] cells)
+    public void SetCell(IEnumerable<Cell<T>> cells)
     {
-        parity = cells.Length;
+        parity = cells.Count();
         foreach (var cell in cells)
         {
             parity--;
             SetCell(cell);
         }
+    }
+
+    public void SetCell(params Cell<T>[] cells)
+    {
+        SetCell(cells.ToList());
     }
 
     private void SetCell(Cell<T> cell)
