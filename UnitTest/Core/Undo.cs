@@ -187,4 +187,30 @@ public class Undo
         actual.Undo();
         Assert.IsTrue(expected.ContentEquals(actual));
     }
+
+    [TestMethod]
+    public void Undo_ReorderRow_OperationReverted()
+    {
+        var expected = Helper.GetSampleTable();
+        var actual = Helper.GetSampleTable();
+
+        actual.ReorderRow(0, 1);
+        Assert.IsFalse(expected.ContentEquals(actual));
+
+        actual.Undo();
+        Assert.IsTrue(expected.ContentEquals(actual));
+    }
+
+    [TestMethod]
+    public void Undo_ReorderColumn_OperationReverted()
+    {
+        var expected = Helper.GetSampleTable();
+        var actual = Helper.GetSampleTable();
+
+        actual.ReorderColumn(0, 1);
+        Assert.IsFalse(expected.ContentEquals(actual));
+
+        actual.Undo();
+        Assert.IsTrue(expected.ContentEquals(actual));
+    }
 }
