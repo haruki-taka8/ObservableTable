@@ -13,38 +13,57 @@ public static class Importer
         BadDataFound = null
     };
 
-    private static IList<IList<string?>> GetRecords(CsvReader csvReader)
+    private static IEnumerable<IList<string?>> GetRecords(string path)
     {
-        IList<IList<string?>> records = new List<IList<string?>>();
+        using StreamReader streamReader = new(path);
+        using CsvReader csvReader = new(streamReader, configuration);
+        
         while (csvReader.Read())
         {
-            var thisRow = csvReader.Parser.Record?.ToList();
-            if (thisRow is null) { continue; }
-            records.Add(thisRow);
+            var row = csvReader.Parser.Record ?? Array.Empty<string>();
+            yield return row;
         }
-        return records;
     }
 
-    private static IEnumerable<string> GetHeader(IEnumerable<string?> firstRecord, bool hasHeader = true)
+    private static IEnumerable<string> FillNull(IEnumerable<string?> row)
     {
-        return hasHeader
-            ? firstRecord.Select(x => x ?? "")
-            : Enumerable.Range(0, firstRecord.Count()).Select(x => x.ToString());
-    }
-
-    public static ObservableTable<string> FromFilePath(string filePath, bool hasHeader = true)
-    {
-        using StreamReader streamReader = new(filePath);
-        using CsvReader csvReader = new(streamReader, configuration);
-
-        var records = GetRecords(csvReader);
-        var headers = new List<string>();
-        if (records.Count > 0)
+        foreach (var item in row)
         {
-            headers = GetHeader(records[0], hasHeader).ToList();
-            if (hasHeader) { records.RemoveAt(0); }
+            yield return item ?? "";
         }
+    }
 
-        return new ObservableTable<string>(headers, records.ToArray());
+    private static IEnumerable<string> GetNumberedHeaders(int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            yield return i.ToString();
+        }
+    }
+
+    private static ObservableTable<string> NewTableWithHeader(IList<IList<string?>> records)
+    {
+        var headers = FillNull(records[0]);
+        records.RemoveAt(0);
+
+        return new(headers, records);
+    }
+
+    private static ObservableTable<string> NewTableWithoutHeader(IList<IList<string?>> records)
+    {
+        var headers = GetNumberedHeaders(records[0].Count);
+
+        return new(headers, records);
+    }
+
+    public static ObservableTable<string> FromFilePath(string path, bool hasHeader = true)
+    {
+        var records = GetRecords(path).ToList();
+
+        if (records.Count == 0) { return new(); }
+
+        return hasHeader
+               ? NewTableWithHeader(records)
+               : NewTableWithoutHeader(records);
     }
 }

@@ -159,14 +159,18 @@ public class ObservableTable<T>
         int index = headers.IndexOf(header);
         headers.Remove(header);
 
-        List<T?> column = new();
+        var removed = RemoveColumn(index).ToList();
+
+        RecordTransaction(new ColumnEdit<T>(parity, false, index, header, removed));
+    }
+
+    private IEnumerable<T?> RemoveColumn(int index)
+    {
         foreach (var record in Records)
         {
-            column.Add(record[index]);
+            yield return record[index];
             record.RemoveAt(index);
         }
-
-        RecordTransaction(new ColumnEdit<T>(parity, false, index, header, column));
     }
 
     public void SetCell(IEnumerable<Cell<T>> cells)
