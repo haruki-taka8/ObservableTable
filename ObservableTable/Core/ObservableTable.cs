@@ -96,9 +96,7 @@ public class ObservableTable<T>
 
         foreach (var record in Records)
         {
-            T? item = record[oldIndex];
-            record.RemoveAt(oldIndex);
-            record.Insert(newIndex, item);
+            record.Move(oldIndex, newIndex);
         }
         RecordTransaction(new ReorderEdit<T>(parity, oldIndex, newIndex, true));
     }
@@ -251,13 +249,11 @@ public class ObservableTable<T>
         switch (edit)
         {
             case RowEdit<T> row when edit.IsInsert:
-                Records.Insert(row.Index, new(row));
-                TableModified?.Invoke(this, new());
+                InsertRow(row.Index, row);
                 break;
 
             case RowEdit<T> row:
-                Records.RemoveAt(row.Index);
-                TableModified?.Invoke(this, new());
+                RemoveRow(Records[row.Index]);
                 break;
 
             case ColumnRenameEdit<T> column:
