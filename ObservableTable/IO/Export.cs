@@ -1,48 +1,32 @@
 ﻿using ObservableTable.Core;
-using System.Text;
 
 namespace ObservableTable.IO;
 
 public static class Exporter
 {
-    private static string ConcatenateList(IList<string?> list)
+    private static string ConcatenateList(IEnumerable<string?> list)
     {
-        if (list.Count == 0) { return ""; }
+        if (!list.Any()) { return ""; }
         return '"' + string.Join("\",\"", list) + '"';
     }
 
     public static string ToCsvString(ObservableTable<string> table, bool hasHeader = true)
     {
-        StringBuilder builder = new();
-
-        if (hasHeader)
-        { 
-            builder.AppendLine(ConcatenateList((IList<string?>)table.Headers));
-        }
-
-        foreach (var record in table.Records)
-        {
-            builder.AppendLine(ConcatenateList(record));
-        }
-
-        return builder.ToString().Trim();
+        var output = ToIEnumerable(table, hasHeader);
+        return string.Join(Environment.NewLine, output);
     }
 
-    public static IEnumerable<string> ToCsvStringEnumerable(ObservableTable<string> table, bool hasHeader)
+    public static IEnumerable<string> ToIEnumerable(ObservableTable<string> table, bool hasHeader)
     {
-        List<string> output = new();
-
         if (hasHeader)
         {
-            output.Add(ConcatenateList((IList<string?>)table.Headers));
+            yield return ConcatenateList(table.Headers);
         }
 
         foreach (var record in table.Records)
         {
-            output.Add(ConcatenateList(record));
+            yield return ConcatenateList(record);
         }
-
-        return output;
     }
 
     public static void ToFile(string path, ObservableTable<string> table, bool hasHeader = true)

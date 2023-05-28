@@ -116,7 +116,7 @@ public class Output
     {
         var table = Importer.FromFilePath(CsvFolder + "Quoted.csv", true);
 
-        var actualTableString = Exporter.ToCsvStringEnumerable(table, true);
+        var actualTableString = Exporter.ToIEnumerable(table, true);
 
         AssertTableEnumerable(actualTableString);
     }
@@ -126,7 +126,7 @@ public class Output
     {
         var table = Importer.FromFilePath(CsvFolder + "Quoted.csv", false);
 
-        var actualTableString = Exporter.ToCsvStringEnumerable(table, false);
+        var actualTableString = Exporter.ToIEnumerable(table, false);
 
         AssertTableEnumerable(actualTableString);
     }
@@ -146,7 +146,7 @@ public class Output
     {
         var table = Importer.FromFilePath(CsvFolder + "Unquoted.csv", false);
 
-        var actualTableString = Exporter.ToCsvStringEnumerable(table, false);
+        var actualTableString = Exporter.ToIEnumerable(table, false);
 
         AssertTableEnumerable(actualTableString);
     }
@@ -156,7 +156,7 @@ public class Output
     {
         var table = Importer.FromFilePath(CsvFolder + "Single.csv", true);
 
-        var actualTableString = Exporter.ToCsvStringEnumerable(table, true);
+        var actualTableString = Exporter.ToIEnumerable(table, true);
 
         Assert.IsTrue(actualTableString.Any());
         Assert.AreEqual(FirstRowInCsvFile, actualTableString.First(), false);
@@ -167,7 +167,7 @@ public class Output
     {
         var table = Importer.FromFilePath(CsvFolder + "Single.csv", false);
 
-        var actualTableString = Exporter.ToCsvStringEnumerable(table, false);
+        var actualTableString = Exporter.ToIEnumerable(table, false);
 
         Assert.IsTrue(actualTableString.Any());
         Assert.AreEqual(FirstRowInCsvFile, actualTableString.First(), false);
@@ -178,7 +178,7 @@ public class Output
     {
         var table = Importer.FromFilePath(CsvFolder + "Empty.csv", true);
 
-        var actualTableString = Exporter.ToCsvStringEnumerable(table, true);
+        var actualTableString = Exporter.ToIEnumerable(table, true);
 
         Assert.IsTrue(
             string.IsNullOrEmpty(string.Join(Environment.NewLine, actualTableString)),
@@ -191,7 +191,7 @@ public class Output
     {
         var table = Importer.FromFilePath(CsvFolder + "Empty.csv", false);
 
-        var actualTableString = Exporter.ToCsvStringEnumerable(table, false);
+        var actualTableString = Exporter.ToIEnumerable(table, false);
 
         Assert.IsTrue(
             string.IsNullOrEmpty(string.Join(Environment.NewLine, actualTableString)),
