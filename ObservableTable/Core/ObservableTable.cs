@@ -15,8 +15,8 @@ public class ObservableTable<T>
     public event EventHandler? TableModified;
 
     private readonly ObservableCollection<T> headers = new();
-    private readonly Stack<IEdit> undo = new();
-    private readonly Stack<IEdit> redo = new();
+    private Stack<IEdit> undo = new();
+    private Stack<IEdit> redo = new();
     private bool recordTransactions;
     private int parity;
 
@@ -96,9 +96,7 @@ public class ObservableTable<T>
 
         foreach (var record in Records)
         {
-            T? item = record[oldIndex];
-            record.RemoveAt(oldIndex);
-            record.Insert(newIndex, item);
+            record.Move(oldIndex, newIndex);
         }
         RecordTransaction(new ReorderEdit<T>(parity, oldIndex, newIndex, true));
     }
@@ -223,7 +221,7 @@ public class ObservableTable<T>
     internal IEdit UpdateCellEdit(IEdit edit)
     {
         edit = edit.DeepClone();
-
+        
         if (edit is ColumnRenameEdit<T> renameEdit)
         {
             renameEdit.Header = Headers[renameEdit.Index];
@@ -236,12 +234,6 @@ public class ObservableTable<T>
             return cellEdit;
         }
 
-        if (edit is ReorderEdit<T> reorderEdit)
-        {
-            reorderEdit.IsUndo = !reorderEdit.IsUndo;
-            return reorderEdit;
-        }
-
         return edit;
     }
 
@@ -250,21 +242,19 @@ public class ObservableTable<T>
         recordTransactions = false;
         switch (edit)
         {
-            case RowEdit<T> row when edit.IsInsert:
-                Records.Insert(row.Index, new(row));
-                TableModified?.Invoke(this, new());
+            case RowEdit<T> row when edit.IsInverted:
+                InsertRow(row.Index, row);
                 break;
 
             case RowEdit<T> row:
-                Records.RemoveAt(row.Index);
-                TableModified?.Invoke(this, new());
+                RemoveRow(Records[row.Index]);
                 break;
 
             case ColumnRenameEdit<T> column:
                 RenameColumn(column.Index, column.Header);
                 break;
 
-            case ColumnEdit<T> column when edit.IsInsert:
+            case ColumnEdit<T> column when edit.IsInverted:
                 InsertColumn(column.Index, column);
                 break;
 
@@ -272,7 +262,7 @@ public class ObservableTable<T>
                 RemoveColumn(column.Header);
                 break;
 
-            case ReorderEdit<T> reorder when reorder.IsColumn && reorder.IsUndo:
+            case ReorderEdit<T> reorder when reorder.IsColumn && reorder.IsInverted:
                 ReorderColumn(reorder.NewIndex, reorder.OldIndex);
                 break;
 
@@ -280,7 +270,7 @@ public class ObservableTable<T>
                 ReorderColumn(reorder.OldIndex, reorder.NewIndex);
                 break;
 
-            case ReorderEdit<T> reorder when reorder.IsUndo:
+            case ReorderEdit<T> reorder when reorder.IsInverted:
                 ReorderRow(reorder.NewIndex, reorder.OldIndex);
                 break;
 
@@ -295,30 +285,29 @@ public class ObservableTable<T>
         recordTransactions = true;
     }
 
+    private void ProcessHistory(ref Stack<IEdit> stack, ref Stack<IEdit> opposite, bool isUndo)
+    {
+        while (stack.Any())
+        {
+            IEdit last = stack.Pop();
+            opposite.Push(UpdateCellEdit(last));
+
+            if (isUndo) { last.IsInverted = !last.IsInverted; }
+            RevertHistory(last);
+
+            int offset = isUndo ? -1 : 1;
+            stack.TryPeek(out IEdit? next);
+            if (last.Parity != next?.Parity + offset) { return; }
+        }
+    }
+
     public void Undo()
     {
-        if (undo.Count == 0) { return; }
-
-        var last = undo.Pop();
-        redo.Push(UpdateCellEdit(last));
-
-        last.IsInsert = !last.IsInsert;
-        RevertHistory(last);
-
-        if (undo.Count == 0) { return; }
-        if (last.Parity == undo.Peek().Parity - 1) { Undo(); }
+        ProcessHistory(ref undo, ref redo, true);
     }
 
     public void Redo()
     {
-        if (redo.Count == 0) { return; }
-
-        var last = redo.Pop();
-        undo.Push(UpdateCellEdit(last));
-
-        RevertHistory(last);
-
-        if (redo.Count == 0) { return; }
-        if (last.Parity == redo.Peek().Parity + 1) { Redo(); }
+        ProcessHistory(ref redo, ref undo, false);
     }
 }

@@ -8,7 +8,7 @@ internal interface IEdit
     internal int Parity { get; init; }
 
     // Unused for CellEdit<T>
-    internal bool IsInsert { get; set; }
+    internal bool IsInverted { get; set; }
     internal int Index { get; init; }
 
     public IEdit DeepClone()
@@ -21,18 +21,18 @@ internal class RowEdit<T> : Row<T>, IEdit
 {
     public int Parity { get; init; }
     public int Index { get; init; }
-    public bool IsInsert { get; set; }
+    public bool IsInverted { get; set; }
 
     internal RowEdit(int parity, bool isInsert, int index, IList<T?> row) : base(row)
     {
         Parity = parity;
-        IsInsert = isInsert;
+        IsInverted = isInsert;
         Index = index;
     }
 
     IEdit IEdit.DeepClone()
     {
-        return new RowEdit<T>(Parity, IsInsert, Index, this);
+        return new RowEdit<T>(Parity, IsInverted, Index, this);
     }
 }
 
@@ -40,12 +40,12 @@ internal class ColumnEdit<T> : Column<T>, IEdit
 {
     public int Parity { get; init; }
     public int Index { get; init; }
-    public bool IsInsert { get; set; }
+    public bool IsInverted { get; set; }
 
     internal ColumnEdit(int parity, bool isInsert, int index, T header, IList<T?> values) : base(header, values)
     {
         Parity = parity;
-        IsInsert = isInsert;
+        IsInverted = isInsert;
         Index = index;
     }
     internal ColumnEdit(int parity, bool isInsert, int index, Column<T> column) : this(parity, isInsert, index, column.Header, column.Values)
@@ -53,7 +53,7 @@ internal class ColumnEdit<T> : Column<T>, IEdit
 
     IEdit IEdit.DeepClone()
     {
-        return new ColumnEdit<T>(Parity, IsInsert, Index, Header, Values);
+        return new ColumnEdit<T>(Parity, IsInverted, Index, Header, Values);
     }
 }
 
@@ -64,7 +64,7 @@ internal class ColumnRenameEdit<T> : IEdit
     public T Header { get; set; }
 
     // Unused members
-    public bool IsInsert { get; set; }
+    public bool IsInverted { get; set; }
 
     internal ColumnRenameEdit(int parity, int index, T header)
     {
@@ -85,7 +85,7 @@ internal class CellEdit<T> : Cell<T>, IEdit
 
     // Unused members
     public int Index { get; init; }
-    public bool IsInsert { get; set; }
+    public bool IsInverted { get; set; }
 
     internal CellEdit(int parity, int rowIndex, int columnIndex, T? value) : base(rowIndex, columnIndex, value)
     {
@@ -108,11 +108,10 @@ internal class ReorderEdit<T> : IEdit
     public int OldIndex { get; init; }
     public int NewIndex { get; init; }
     public bool IsColumn { get; init; }
-    public bool IsUndo { get; set; }
+    public bool IsInverted { get; set; }
 
     // Unused members
     public int Index { get; init; }
-    public bool IsInsert { get; set; }
 
     internal ReorderEdit(int parity, int oldIndex, int newIndex, bool isColumn)
     {
