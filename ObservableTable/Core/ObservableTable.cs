@@ -234,12 +234,6 @@ public class ObservableTable<T>
             return cellEdit;
         }
 
-        if (edit is ReorderEdit<T> reorderEdit)
-        {
-            reorderEdit.IsUndo = !reorderEdit.IsUndo;
-            return reorderEdit;
-        }
-
         return edit;
     }
 
