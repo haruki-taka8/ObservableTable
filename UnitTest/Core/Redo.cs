@@ -76,6 +76,46 @@ public class Redo
     }
 
     [TestMethod]
+    public void Redo_ReorderColumn_OperationsReverted()
+    {
+        var expected = Helper.GetSampleTable();
+        var actual = Helper.GetSampleTable();
+
+        actual.ReorderColumn(0, 1);
+        actual.Undo();
+        Assert.IsTrue(expected.ContentEquals(actual));
+
+        actual.Redo();
+        Assert.IsFalse(expected.ContentEquals(actual));
+
+        actual.Undo();
+        Assert.IsTrue(expected.ContentEquals(actual));
+
+        actual.Redo();
+        Assert.IsFalse(expected.ContentEquals(actual));
+    }
+
+    [TestMethod]
+    public void Redo_ReorderRow_OperationsReverted()
+    {
+        var expected = Helper.GetSampleTable();
+        var actual = Helper.GetSampleTable();
+
+        actual.ReorderRow(0, 1);
+        actual.Undo();
+        Assert.IsTrue(expected.ContentEquals(actual));
+
+        actual.Redo();
+        Assert.IsFalse(expected.ContentEquals(actual));
+
+        actual.Undo();
+        Assert.IsTrue(expected.ContentEquals(actual));
+
+        actual.Redo();
+        Assert.IsFalse(expected.ContentEquals(actual));
+    }
+
+    [TestMethod]
     public void Redo_InsertRows_OperationsReverted()
     {
         var expected = Helper.GetSampleTable();
@@ -228,5 +268,26 @@ public class Redo
 
         actual.Redo();
         Assert.IsFalse(expected.ContentEquals(actual));
+    }
+
+    [TestMethod]
+    public void Redo_ReorderColumns_OperationReverted()
+    {
+        var expected = Helper.GetSampleTable();
+        var actual = Helper.GetSampleTable();
+
+        actual.ReorderColumn(0, 1);
+        actual.ReorderColumn(0, 2);
+        actual.Undo();
+        actual.Undo();
+        Assert.IsTrue(expected.ContentEquals(actual));
+
+        actual.Redo();
+        actual.Redo();
+        Assert.IsFalse(expected.ContentEquals(actual));
+
+        actual.Undo();
+        actual.Undo();
+        Assert.IsTrue(expected.ContentEquals(actual));
     }
 }
