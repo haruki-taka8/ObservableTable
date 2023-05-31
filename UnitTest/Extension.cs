@@ -21,14 +21,4 @@ internal static class Extension
         }
         return true;
     }
-
-    internal static bool ContentEquals<T>(this CellEdit<T> a, CellEdit<T> b)
-    {
-        foreach (var property in a.GetType().GetProperties())
-        {
-            if (property.GetValue(a)?.GetHashCode() != property.GetValue(b)?.GetHashCode())
-            { return false; }
-        }
-        return true;
-    }
 }
