@@ -3,126 +3,21 @@
 [assembly: InternalsVisibleTo("UnitTest")]
 namespace ObservableTable.Core;
 
-internal interface IEdit
+internal class Edit
 {
+    internal Action Undo { get; init; }
+    internal Action Redo { get; init; }
     internal int Parity { get; init; }
 
-    // Unused for CellEdit<T>
-    internal bool IsInverted { get; set; }
-    internal int Index { get; init; }
-
-    public IEdit DeepClone()
+    internal Edit(Action undo, Action redo, int parity)
     {
-        throw new NotImplementedException();
-    }
-}
-
-internal class RowEdit<T> : Row<T>, IEdit
-{
-    public int Parity { get; init; }
-    public int Index { get; init; }
-    public bool IsInverted { get; set; }
-
-    internal RowEdit(int parity, bool isInsert, int index, IList<T?> row) : base(row)
-    {
-        Parity = parity;
-        IsInverted = isInsert;
-        Index = index;
-    }
-
-    IEdit IEdit.DeepClone()
-    {
-        return new RowEdit<T>(Parity, IsInverted, Index, this);
-    }
-}
-
-internal class ColumnEdit<T> : Column<T>, IEdit
-{
-    public int Parity { get; init; }
-    public int Index { get; init; }
-    public bool IsInverted { get; set; }
-
-    internal ColumnEdit(int parity, bool isInsert, int index, T header, IList<T?> values) : base(header, values)
-    {
-        Parity = parity;
-        IsInverted = isInsert;
-        Index = index;
-    }
-    internal ColumnEdit(int parity, bool isInsert, int index, Column<T> column) : this(parity, isInsert, index, column.Header, column.Values)
-    { }
-
-    IEdit IEdit.DeepClone()
-    {
-        return new ColumnEdit<T>(Parity, IsInverted, Index, Header, Values);
-    }
-}
-
-internal class ColumnRenameEdit<T> : IEdit
-{
-    public int Parity { get; init; }
-    public int Index { get; init; }
-    public T Header { get; set; }
-
-    // Unused members
-    public bool IsInverted { get; set; }
-
-    internal ColumnRenameEdit(int parity, int index, T header)
-    {
-        Parity = parity;
-        Index = index;
-        Header = header;
-    }
-
-    IEdit IEdit.DeepClone()
-    {
-        return new ColumnRenameEdit<T>(Parity, Index, Header);
-    }
-}
-
-internal class CellEdit<T> : Cell<T>, IEdit
-{
-    public int Parity { get; init; }
-
-    // Unused members
-    public int Index { get; init; }
-    public bool IsInverted { get; set; }
-
-    internal CellEdit(int parity, int rowIndex, int columnIndex, T? value) : base(rowIndex, columnIndex, value)
-    {
-        Parity = parity;
-    }
-    internal CellEdit(int parity, Cell<T> cell) : base(cell.RowIndex, cell.ColumnIndex, cell.Value)
-    { 
+        Undo = undo;
+        Redo = redo;
         Parity = parity;
     }
 
-    IEdit IEdit.DeepClone()
+    internal void Invoke(bool isUndo)
     {
-        return new CellEdit<T>(Parity, this);
-    }
-}
-
-internal class ReorderEdit<T> : IEdit
-{
-    public int Parity { get; init; }
-    public int OldIndex { get; init; }
-    public int NewIndex { get; init; }
-    public bool IsColumn { get; init; }
-    public bool IsInverted { get; set; }
-
-    // Unused members
-    public int Index { get; init; }
-
-    internal ReorderEdit(int parity, int oldIndex, int newIndex, bool isColumn)
-    {
-        Parity = parity;
-        OldIndex = oldIndex;
-        NewIndex = newIndex;
-        IsColumn = isColumn;
-    }
-
-    IEdit IEdit.DeepClone()
-    {
-        return new ReorderEdit<T>(Parity, OldIndex, NewIndex, IsColumn);
+        if (isUndo) { Undo(); } else { Redo(); }
     }
 }

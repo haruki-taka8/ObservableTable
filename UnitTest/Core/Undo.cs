@@ -189,6 +189,22 @@ public class Undo
     }
 
     [TestMethod]
+    public void Undo_Mix_SomeOperationsReverted()
+    {
+        var expected = Helper.GetSampleTable();
+        var actual = Helper.GetSampleTable();
+
+        actual.InsertRow(0, Array.Empty<string?>());
+        actual.Records[0][0] = "Temp";
+        Assert.IsFalse(expected.ContentEquals(actual));
+
+        actual.Undo();
+        Assert.IsFalse(expected.ContentEquals(actual));
+        Assert.IsTrue(actual.UndoCount == 1);
+        Assert.IsTrue(actual.RedoCount == 1);
+    }
+
+    [TestMethod]
     public void Undo_ReorderRow_OperationReverted()
     {
         var expected = Helper.GetSampleTable();

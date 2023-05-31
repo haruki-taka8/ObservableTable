@@ -144,6 +144,44 @@ public class Redo
     }
 
     [TestMethod]
+    public void Redo_InsertRows_Repeated_Reverted()
+    {
+        var expected = Helper.GetSampleTable();
+        var actual = Helper.GetSampleTable();
+
+        actual.InsertRow(0, Array.Empty<string>());
+        actual.InsertRow(1, Array.Empty<string>());
+
+        actual.Undo();
+        actual.Undo();
+        actual.Redo();
+        actual.Redo();
+        actual.Undo();
+        actual.Undo();
+
+        Assert.IsTrue(expected.ContentEquals(actual));
+    }
+
+    [TestMethod]
+    public void Redo_InsertColumns_Repeated_Reverted()
+    {
+        var expected = Helper.GetSampleTable();
+        var actual = Helper.GetSampleTable();
+
+        actual.InsertColumn(0, new Column<string>("A", Array.Empty<string>()));
+        actual.InsertColumn(1, new Column<string>("A", Array.Empty<string>()));
+
+        actual.Undo();
+        actual.Undo();
+        actual.Redo();
+        actual.Redo();
+        actual.Undo();
+        actual.Undo();
+
+        Assert.IsTrue(expected.ContentEquals(actual));
+    }
+
+    [TestMethod]
     public void Redo_RenameColumn_OperationsReverted()
     {
         var expected = Helper.GetSampleTable();
@@ -240,6 +278,23 @@ public class Redo
         actual.Redo();
         actual.Redo();
         Assert.IsFalse(expected.ContentEquals(actual));
+    }
+
+    [TestMethod]
+    public void Redo_Mix_SomeOperationsReverted()
+    {
+        var expected = Helper.GetSampleTable();
+        var actual = Helper.GetSampleTable();
+
+        actual.InsertRow(0, Array.Empty<string?>());
+        actual.Records[0][0] = "Changed";
+        actual.Undo();
+        actual.Undo();
+        Assert.IsTrue(expected.ContentEquals(actual));
+
+        actual.Redo();
+        Assert.IsTrue(actual.UndoCount == 1);
+        Assert.IsTrue(actual.RedoCount == 1);
     }
 
     [TestMethod]

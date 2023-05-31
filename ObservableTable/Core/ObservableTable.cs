@@ -15,8 +15,8 @@ public class ObservableTable<T>
     public event EventHandler? TableModified;
 
     private readonly ObservableCollection<T> headers = new();
-    private Stack<IEdit> undo = new();
-    private Stack<IEdit> redo = new();
+    private Stack<Edit> undo = new();
+    private Stack<Edit> redo = new();
     private bool recordTransactions;
     private int parity;
 
@@ -59,7 +59,10 @@ public class ObservableTable<T>
         toAdd.CollectionChanged += RecordChanged;
         Records.Insert(index, toAdd);
 
-        RecordTransaction(new RowEdit<T>(parity, true, index, row));
+        RecordTransaction(
+            () => RemoveRow(Records[index]),
+            () => InsertRow(index, row)
+        );
     }
 
     public void RemoveRow(IEnumerable<ObservableCollection<T?>> rows)
@@ -81,13 +84,21 @@ public class ObservableTable<T>
     {
         int index = Records.IndexOf(row);
         Records.Remove(row);
-        RecordTransaction(new RowEdit<T>(parity, false, index, row));
+
+        RecordTransaction(
+            () => InsertRow(index, row),
+            () => RemoveRow(Records[index])
+        );
     }
 
     public void ReorderRow(int oldIndex, int newIndex)
     {
         Records.Move(oldIndex, newIndex);
-        RecordTransaction(new ReorderEdit<T>(parity, oldIndex, newIndex, false));
+
+        RecordTransaction(
+            () => ReorderRow(newIndex, oldIndex),
+            () => ReorderRow(oldIndex, newIndex)
+        );
     }
 
     public void ReorderColumn(int oldIndex, int newIndex)
@@ -98,13 +109,22 @@ public class ObservableTable<T>
         {
             record.Move(oldIndex, newIndex);
         }
-        RecordTransaction(new ReorderEdit<T>(parity, oldIndex, newIndex, true));
+
+        RecordTransaction(
+            () => ReorderColumn(newIndex, oldIndex),
+            () => ReorderColumn(oldIndex, newIndex)
+        );
     }
 
     public void RenameColumn(int index, T header)
     {
-        RecordTransaction(new ColumnRenameEdit<T>(parity, index, headers[index]));
+        T oldHeader = headers[index];
         headers[index] = header;
+
+        RecordTransaction(
+            () => RenameColumn(index, oldHeader),
+            () => RenameColumn(index, header)
+        );
     }
 
     public void InsertColumn(int index, IEnumerable<Column<T>> columns)
@@ -133,7 +153,10 @@ public class ObservableTable<T>
 
         headers.Insert(index, column.Header);
 
-        RecordTransaction(new ColumnEdit<T>(parity, true, index, column));
+        RecordTransaction(
+            () => RemoveColumn(column.Header),
+            () => InsertColumn(index, column)
+        );
     }
 
     public void RemoveColumn(IEnumerable<T> headers)
@@ -159,7 +182,10 @@ public class ObservableTable<T>
 
         var removed = RemoveColumn(index).ToList();
 
-        RecordTransaction(new ColumnEdit<T>(parity, false, index, header, removed));
+        RecordTransaction(
+            () => InsertColumn(index, new Column<T>(header, removed)),
+            () => RemoveColumn(header)
+        );
     }
 
     private IEnumerable<T?> RemoveColumn(int index)
@@ -198,105 +224,47 @@ public class ObservableTable<T>
         if (
             e.Action != NotifyCollectionChangedAction.Replace
             || sender is null
-            || e.OldItems is null
         ) { return; }
 
         // Handles inline changes
         var record = (ObservableCollection<T?>)sender;
-        var row = Records.IndexOf(record);
-        var cell = (T?)e.OldItems[0];
+        int row = Records.IndexOf(record);
+        int column = e.OldStartingIndex;
+        var oldCell = (T?)e.OldItems?[0];
+        var newCell = (T?)e.NewItems?[0];
 
-        RecordTransaction(new CellEdit<T>(parity, row, e.OldStartingIndex, cell));
+        RecordTransaction(
+            () => SetCell(new Cell<T>(row, column, oldCell)),
+            () => SetCell(new Cell<T>(row, column, newCell))
+        );
     }
 
-    private void RecordTransaction(IEdit operation)
+    private void RecordTransaction(Action undoAction, Action redoAction)
     {
         TableModified?.Invoke(this, new());
 
         if (!recordTransactions) { return; }
-        undo.Push(operation);
+        undo.Push(new(undoAction, redoAction, parity));
         redo.Clear();
     }
 
-    internal IEdit UpdateCellEdit(IEdit edit)
-    {
-        edit = edit.DeepClone();
-        
-        if (edit is ColumnRenameEdit<T> renameEdit)
-        {
-            renameEdit.Header = Headers[renameEdit.Index];
-            return renameEdit;
-        }
-
-        if (edit is CellEdit<T> cellEdit)
-        {
-            cellEdit.Value = Records[cellEdit.RowIndex][cellEdit.ColumnIndex];
-            return cellEdit;
-        }
-
-        return edit;
-    }
-
-    private void RevertHistory(IEdit edit)
+    private void RevertHistory(Edit edit, bool isUndo)
     {
         recordTransactions = false;
-        switch (edit)
-        {
-            case RowEdit<T> row when edit.IsInverted:
-                InsertRow(row.Index, row);
-                break;
-
-            case RowEdit<T> row:
-                RemoveRow(Records[row.Index]);
-                break;
-
-            case ColumnRenameEdit<T> column:
-                RenameColumn(column.Index, column.Header);
-                break;
-
-            case ColumnEdit<T> column when edit.IsInverted:
-                InsertColumn(column.Index, column);
-                break;
-
-            case ColumnEdit<T> column:
-                RemoveColumn(column.Header);
-                break;
-
-            case ReorderEdit<T> reorder when reorder.IsColumn && reorder.IsInverted:
-                ReorderColumn(reorder.NewIndex, reorder.OldIndex);
-                break;
-
-            case ReorderEdit<T> reorder when reorder.IsColumn:
-                ReorderColumn(reorder.OldIndex, reorder.NewIndex);
-                break;
-
-            case ReorderEdit<T> reorder when reorder.IsInverted:
-                ReorderRow(reorder.NewIndex, reorder.OldIndex);
-                break;
-
-            case ReorderEdit<T> reorder:
-                ReorderRow(reorder.OldIndex, reorder.NewIndex);
-                break;
-
-            case CellEdit<T> cell:
-                SetCell(cell);
-                break;
-        }
+        edit.Invoke(isUndo);
         recordTransactions = true;
     }
 
-    private void ProcessHistory(ref Stack<IEdit> stack, ref Stack<IEdit> opposite, bool isUndo)
+    private void ProcessHistory(ref Stack<Edit> stack, ref Stack<Edit> opposite, bool isUndo)
     {
         while (stack.Any())
         {
-            IEdit last = stack.Pop();
-            opposite.Push(UpdateCellEdit(last));
-
-            if (isUndo) { last.IsInverted = !last.IsInverted; }
-            RevertHistory(last);
+            Edit last = stack.Pop();
+            opposite.Push(last);
+            RevertHistory(last, isUndo);
 
             int offset = isUndo ? -1 : 1;
-            stack.TryPeek(out IEdit? next);
+            stack.TryPeek(out Edit? next);
             if (last.Parity != next?.Parity + offset) { return; }
         }
     }
