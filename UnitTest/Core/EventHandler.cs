@@ -79,6 +79,30 @@ public class EventHandler
     }
 
     [TestMethod]
+    public void EventHandler_ReorderRow_Notified()
+    {
+        var table = Helper.GetSampleTable();
+        var modified = false;
+
+        table.TableModified += (object? sender, EventArgs e) => modified = true;
+
+        table.ReorderRow(0,1);
+        Assert.IsTrue(modified);
+    }
+
+    [TestMethod]
+    public void EventHandler_ReorderColumn_Notified()
+    {
+        var table = Helper.GetSampleTable();
+        var modified = false;
+
+        table.TableModified += (object? sender, EventArgs e) => modified = true;
+
+        table.ReorderColumn(0, 1);
+        Assert.IsTrue(modified);
+    }
+
+    [TestMethod]
     public void EventHandler_Undo_Notified()
     {
         var table = Helper.GetSampleTable();
