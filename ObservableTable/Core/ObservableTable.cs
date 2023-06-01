@@ -33,7 +33,7 @@ public class ObservableTable<T>
         recordTransactions = true;
     }
 
-    public ObservableTable(IEnumerable<T> headers, params IList<T?>[] records) : this(headers, records.ToList())
+    public ObservableTable(IEnumerable<T> headers, params IList<T?>[] records) : this(headers, records.AsEnumerable())
     { }
 
     // Methods: Record modifications
@@ -49,7 +49,7 @@ public class ObservableTable<T>
 
     public void InsertRow(int index, params IList<T?>[] rows)
     {
-        InsertRow(index, rows.ToList());
+        InsertRow(index, rows.AsEnumerable());
     }
 
     private void InsertRow(int index, IList<T?> row)
@@ -77,7 +77,7 @@ public class ObservableTable<T>
 
     public void RemoveRow(params ObservableCollection<T?>[] rows)
     {
-        RemoveRow(rows.ToList());
+        RemoveRow(rows.AsEnumerable());
     }
 
     private void RemoveRow(ObservableCollection<T?> row)
@@ -139,7 +139,7 @@ public class ObservableTable<T>
 
     public void InsertColumn(int index, params Column<T>[] columns)
     {
-        InsertColumn(index, columns.ToList());
+        InsertColumn(index, columns.AsEnumerable());
     }
 
     private void InsertColumn(int index, Column<T> column)
@@ -171,7 +171,7 @@ public class ObservableTable<T>
 
     public void RemoveColumn(params T[] headers)
     {
-        RemoveColumn(headers.ToList());
+        RemoveColumn(headers.AsEnumerable());
     }
 
     private void RemoveColumn(T header)
@@ -209,7 +209,7 @@ public class ObservableTable<T>
 
     public void SetCell(params Cell<T>[] cells)
     {
-        SetCell(cells.ToList());
+        SetCell(cells.AsEnumerable());
     }
 
     private void SetCell(Cell<T> cell)
