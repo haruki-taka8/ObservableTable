@@ -1,9 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿namespace ObservableTable.Core;
 
-[assembly: InternalsVisibleTo("UnitTest")]
-namespace ObservableTable.Core;
-
-internal class Edit
+internal readonly struct Edit
 {
     internal Action Undo { get; init; }
     internal Action Redo { get; init; }

@@ -1,8 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("UnitTest")]
 namespace ObservableTable.Core;
 
 public class ObservableTable<T>
@@ -215,7 +213,7 @@ public class ObservableTable<T>
     private void SetCell(Cell<T> cell)
     {
         // Let RecordChanged record the transcation
-        Records[cell.RowIndex][cell.ColumnIndex] = cell.Value;
+        Records[cell.Row][cell.Column] = cell.Value;
     }
 
     // Methods: History
@@ -264,8 +262,8 @@ public class ObservableTable<T>
             RevertHistory(last, isUndo);
 
             int offset = isUndo ? -1 : 1;
-            stack.TryPeek(out Edit? next);
-            if (last.Parity != next?.Parity + offset) { return; }
+            stack.TryPeek(out Edit next);
+            if (last.Parity != next.Parity + offset) { return; }
         }
     }
 
