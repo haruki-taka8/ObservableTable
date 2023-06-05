@@ -212,7 +212,7 @@ public class ObservableTable<T>
 
     private void SetCell(Cell<T> cell)
     {
-        // Let RecordChanged record the transcation
+        // Let RecordChanged record the transaction
         Records[cell.Row][cell.Column] = cell.Value;
     }
 
@@ -255,13 +255,13 @@ public class ObservableTable<T>
 
     private void ProcessHistory(ref Stack<Edit> stack, ref Stack<Edit> opposite, bool isUndo)
     {
-        while (stack.Any())
+        int offset = isUndo ? -1 : 1;
+
+        while (stack.TryPop(out Edit last))
         {
-            Edit last = stack.Pop();
             opposite.Push(last);
             RevertHistory(last, isUndo);
 
-            int offset = isUndo ? -1 : 1;
             stack.TryPeek(out Edit next);
             if (last.Parity != next.Parity + offset) { return; }
         }
