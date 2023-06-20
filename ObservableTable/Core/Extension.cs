@@ -1,16 +1,39 @@
-﻿namespace ObservableTable.Core;
+﻿using System.Text.RegularExpressions;
+
+namespace ObservableTable.Core;
 
 internal static class Extension
 {
-    internal static IList<T?> PadRight<T>(this IList<T?> list, int resultantLength)
+    private static IEnumerable<Cell<string>> ReplacedCells(string from, string to, bool matchRegex, IEnumerable<Cell<string>> cells)
     {
-        if (list.Count > resultantLength)
+        foreach (var cell in cells)
         {
-            throw new ArgumentException("Input list longer than desired resultant length", nameof(list));
-        }
+            if (cell.Value is null) { continue; }
 
-        var output = new T?[resultantLength];
-        list.CopyTo(output, 0);
-        return output;
+            if (!matchRegex && cell.Value.Contains(from))
+            {
+                Cell<string> newCell = new(cell.Row, cell.Column, cell.Value.Replace(from, to));
+                yield return newCell;
+            }
+
+            if (matchRegex && Regex.IsMatch(cell.Value, from))
+            {
+                Cell<string> newCell = new(cell.Row, cell.Column, Regex.Replace(cell.Value, from, to));
+                yield return newCell;
+            }
+        }
+    }
+
+    public static void ReplaceCellSubstring(this ObservableTable<string> table, string from, string to, bool matchRegex = false, IEnumerable<Cell<string>>? cells = null)
+    {
+        cells ??= table.ListCells();
+
+        var toChange = ReplacedCells(from, to, matchRegex, cells).ToList();
+        table.SetCell(toChange);
+    }
+
+    public static void ReplaceCellSubstring(this ObservableTable<string> table, string from, string to, bool matchRegex = false, params Cell<string>[] cells)
+    {
+        table.ReplaceCellSubstring(from, to, matchRegex, cells.ToList());
     }
 }
