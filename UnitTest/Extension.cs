@@ -4,7 +4,7 @@ namespace UnitTest;
 
 internal static class Extension
 {
-    internal static bool ContentEquals(this ObservableTable<string> a, ObservableTable<string> b)
+    internal static bool ContentEquals<T>(this ObservableTable<T> a, ObservableTable<T> b)
     {
         // Headers
         if (!Enumerable.SequenceEqual(a.Headers, b.Headers))
