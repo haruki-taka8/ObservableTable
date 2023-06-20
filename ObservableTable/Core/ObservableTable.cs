@@ -216,6 +216,32 @@ public class ObservableTable<T>
         Records[cell.Row][cell.Column] = cell.Value;
     }
 
+    private static IEnumerable<Cell<T>> ReplacedCells(T from, T to, IEnumerable<Cell<T>> cells)
+    {
+        if (from is null) { yield break; }
+
+        foreach (var cell in cells)
+        {
+            if (!from.Equals(cell.Value)) { continue; }
+
+            Cell<T> newCell = new(cell.Row, cell.Column, to);
+            yield return newCell;
+        }
+    }
+
+    public void ReplaceCell(T from, T to, IEnumerable<Cell<T>>? cells = null)
+    {
+        cells ??= this.ListCells();
+
+        var toChange = ReplacedCells(from, to, cells).ToList();
+        SetCell(toChange);
+    }
+
+    public void ReplaceCell(T from, T to, params Cell<T>[] cells)
+    {
+        ReplaceCell(from, to, cells.ToList());
+    }
+
     // Methods: History
     internal void RecordChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
