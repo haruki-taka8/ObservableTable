@@ -244,4 +244,30 @@ public class Undo
         actual.Undo();
         Assert.IsTrue(expected.ContentEquals(actual));
     }
+
+    [TestMethod]
+    public void Undo_ReplaceCellSubstring_OperationsReverted()
+    {
+        var expected = Helper.GetSampleTable();
+        var actual = Helper.GetSampleTable();
+
+        actual.ReplaceCellSubstring(@"\d", "!", true);
+        Assert.IsFalse(expected.ContentEquals(actual));
+
+        actual.Undo();
+        Assert.IsTrue(expected.ContentEquals(actual));
+    }
+
+    [TestMethod]
+    public void Undo_ReplaceCell_OperationsReverted()
+    {
+        var expected = Helper.GetSampleIntTable();
+        var actual = Helper.GetSampleIntTable();
+
+        actual.ReplaceCell(4, 0);
+        Assert.IsFalse(expected.ContentEquals(actual));
+
+        actual.Undo();
+        Assert.IsTrue(expected.ContentEquals(actual));
+    }
 }

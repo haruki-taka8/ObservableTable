@@ -2,7 +2,7 @@
 
 namespace ObservableTable.Core;
 
-internal static class Extension
+public static class Extension
 {
     private static IEnumerable<Cell<string>> ReplacedCells(string from, string to, bool matchRegex, IEnumerable<Cell<string>> cells)
     {

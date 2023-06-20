@@ -24,4 +24,13 @@ internal static class Helper
             new string?[] { "A5", "B5", "C5" }
         );
     }
+
+    internal static ObservableTable<int> GetSampleIntTable()
+    {
+        return new ObservableTable<int>(
+            new int[] { 1, 2, 3 },
+            new int[] { 4, 5, 6 },
+            new int[] { 7, 8, 9 }
+        );
+    }
 }
