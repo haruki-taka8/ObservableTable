@@ -9,7 +9,7 @@ internal static class Helper
         return output;
     }
 
-    internal static IEnumerable<Cell<T>> ListCells<T>(this ObservableTable<T> table)
+    internal static IEnumerable<Cell<T>> ToCells<T>(this ObservableTable<T> table)
     {
         for (int row = 0; row < table.Records.Count; row++)
         {
