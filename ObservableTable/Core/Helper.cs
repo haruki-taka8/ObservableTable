@@ -19,4 +19,19 @@ internal static class Helper
             }
         }
     }
+
+    internal static IEnumerable<Cell<T>> Replace<T>(this IEnumerable<Cell<T>> cells, T from, T to)
+    {
+        foreach (var cell in cells)
+        {
+            yield return Replace(cell, from, to);
+        }
+    }
+
+    private static Cell<T> Replace<T>(this Cell<T> cell, T from, T to)
+    {
+        return Equals(from, cell.Value)
+            ? new(cell.Row, cell.Column, to)
+            : cell;
+    }
 }
