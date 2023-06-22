@@ -4,36 +4,54 @@ namespace ObservableTable.Core;
 
 public static class Extension
 {
-    private static IEnumerable<Cell<string>> ReplacedCells(string from, string to, bool matchRegex, IEnumerable<Cell<string>> cells)
+    public static IEnumerable<Cell<string>> FindCellsWithSubstring(this ObservableTable<string> table, string value, bool matchRegex = false, IEnumerable<Cell<string>>? cells = null)
     {
-        foreach (var cell in cells)
+        bool MatchRegex(Cell<string> cell)
         {
-            if (cell.Value is null) { continue; }
-
-            if (!matchRegex && cell.Value.Contains(from))
-            {
-                Cell<string> newCell = new(cell.Row, cell.Column, cell.Value.Replace(from, to));
-                yield return newCell;
-            }
-
-            if (matchRegex && Regex.IsMatch(cell.Value, from))
-            {
-                Cell<string> newCell = new(cell.Row, cell.Column, Regex.Replace(cell.Value, from, to));
-                yield return newCell;
-            }
+            return Regex.IsMatch(cell.Value!, value);
         }
+
+        bool MatchLiteral(Cell<string> cell)
+        {
+            return cell.Value!.Contains(value);
+        }
+
+        cells ??= table.ToCells();
+
+        return cells
+            .Where(x => x.Value is not null)
+            .Where(matchRegex ? MatchRegex : MatchLiteral);
     }
 
-    public static void ReplaceCellSubstring(this ObservableTable<string> table, string from, string to, bool matchRegex = false, IEnumerable<Cell<string>>? cells = null)
+    private static IEnumerable<Cell<string>> Replace(this IEnumerable<Cell<string>> cells, string from, string to, bool matchRegex)
     {
-        cells ??= table.ListCells();
+        Cell<string> ReplaceRegex(Cell<string> x)
+        {
+            string value = Regex.Replace(x.Value!, from, to);
+            return new(x.Row, x.Column, value);
+        }
 
-        var toChange = ReplacedCells(from, to, matchRegex, cells).ToList();
+        Cell<string> ReplaceLiteral(Cell<string> x)
+        {
+            string value = x.Value!.Replace(from, to);
+            return new(x.Row, x.Column, value);
+        }
+
+        return cells
+            .Where(x => x.Value is not null)
+            .Select(x => matchRegex ? ReplaceRegex(x) : ReplaceLiteral(x));
+    }
+
+    public static void ReplaceCellsWithSubstring(this ObservableTable<string> table, string from, string to, bool matchRegex = false, IEnumerable<Cell<string>>? cells = null)
+    {
+        cells = table.FindCellsWithSubstring(from, matchRegex, cells);
+
+        var toChange = cells.Replace(from, to, matchRegex);
         table.SetCell(toChange);
     }
 
     public static void ReplaceCellSubstring(this ObservableTable<string> table, string from, string to, bool matchRegex = false, params Cell<string>[] cells)
     {
-        table.ReplaceCellSubstring(from, to, matchRegex, cells.ToList());
+        table.ReplaceCellsWithSubstring(from, to, matchRegex, cells.AsEnumerable());
     }
 }
