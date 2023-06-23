@@ -347,12 +347,12 @@ public class Redo
     }
 
     [TestMethod]
-    public void Undo_ReplaceCellSubstring_OperationsReverted()
+    public void Undo_ReplaceCellWithSubstring_OperationsReverted()
     {
         var expected = Helper.GetSampleTable();
         var actual = Helper.GetSampleTable();
 
-        actual.ReplaceCellsWithSubstring(@"\d", "!", true);
+        actual.ReplaceCellWithSubstring(@"\d", "!", true);
         Assert.IsFalse(expected.ContentEquals(actual));
 
         actual.Undo();

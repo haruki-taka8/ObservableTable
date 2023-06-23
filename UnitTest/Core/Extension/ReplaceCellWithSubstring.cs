@@ -1,12 +1,12 @@
 ﻿using ObservableTable.Core;
 
-namespace UnitTest.Core;
+namespace UnitTest.Core.Extension;
 
 [TestClass]
 public class ReplaceCellWithSubstring
 {
     [TestMethod]
-    public void ReplaceCellSubstring_NoRegex_AllCells_Replaceable_Replaced()
+    public void ReplaceCellWithSubstring_NoRegex_AllCells_Replaceable_Replaced()
     {
         ObservableTable<string> expected = new(
             new string[] { "A0", "B0", "C0" },
@@ -15,24 +15,24 @@ public class ReplaceCellWithSubstring
         );
         var actual = Helper.GetSampleTable();
 
-        actual.ReplaceCellsWithSubstring("A", "!");
+        actual.ReplaceCellWithSubstring("A", "!");
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
 
     [TestMethod]
-    public void ReplaceCellSubstring_NoRegex_AllCells_Irreplaceable_Nothing()
+    public void ReplaceCellWithSubstring_NoRegex_AllCells_Irreplaceable_Nothing()
     {
         var expected = Helper.GetSampleTable();
         var actual = Helper.GetSampleTable();
 
-        actual.ReplaceCellsWithSubstring("foobar", "!");
+        actual.ReplaceCellWithSubstring("foobar", "!");
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
 
     [TestMethod]
-    public void ReplaceCellSubstring_NoRegex_FirstRow_Replaceable_Replaced()
+    public void ReplaceCellWithSubstring_NoRegex_FirstRow_Replaceable_Replaced()
     {
         ObservableTable<string> expected = new(
             new string[] { "A0", "B0", "C0" },
@@ -47,13 +47,13 @@ public class ReplaceCellWithSubstring
             new(0, 2, "C1")
         };
 
-        actual.ReplaceCellsWithSubstring("1", "!", false, firstRow);
+        actual.ReplaceCellWithSubstring("1", "!", false, firstRow);
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
 
     [TestMethod]
-    public void ReplaceCellSubstring_NoRegex_FirstRow_Irreplaceable_Nothing()
+    public void ReplaceCellWithSubstring_NoRegex_FirstRow_Irreplaceable_Nothing()
     {
         var expected = Helper.GetSampleTable();
         var actual = Helper.GetSampleTable();
@@ -64,13 +64,13 @@ public class ReplaceCellWithSubstring
             new(0, 2, "C1")
         };
 
-        actual.ReplaceCellsWithSubstring("foobar", "!", false, firstRow);
+        actual.ReplaceCellWithSubstring("foobar", "!", false, firstRow);
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
 
     [TestMethod]
-    public void ReplaceCellSubstring_Regex_AllCells_Replaceable_Replaced()
+    public void ReplaceCellWithSubstring_Regex_AllCells_Replaceable_Replaced()
     {
         ObservableTable<string> expected = new(
             new string[] { "A0", "B0", "C0" },
@@ -79,24 +79,24 @@ public class ReplaceCellWithSubstring
         );
         var actual = Helper.GetSampleTable();
 
-        actual.ReplaceCellsWithSubstring(@"\d", "!", true);
+        actual.ReplaceCellWithSubstring(@"\d", "!", true);
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
 
     [TestMethod]
-    public void ReplaceCellSubstring_Regex_AllCells_Irreplaceable_Nothing()
+    public void ReplaceCellWithSubstring_Regex_AllCells_Irreplaceable_Nothing()
     {
         var expected = Helper.GetSampleTable();
         var actual = Helper.GetSampleTable();
 
-        actual.ReplaceCellsWithSubstring(@"\s", "!", true);
+        actual.ReplaceCellWithSubstring(@"\s", "!", true);
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
 
     [TestMethod]
-    public void ReplaceCellSubstring_Regex_FirstRow_Replaceable_Replaced()
+    public void ReplaceCellWithSubstring_Regex_FirstRow_Replaceable_Replaced()
     {
         ObservableTable<string> expected = new(
             new string[] { "A0", "B0", "C0" },
@@ -111,13 +111,13 @@ public class ReplaceCellWithSubstring
             new(0, 2, "C1")
         };
 
-        actual.ReplaceCellsWithSubstring(@"\d", "!", true, firstRow);
+        actual.ReplaceCellWithSubstring(@"\d", "!", true, firstRow);
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
 
     [TestMethod]
-    public void ReplaceCellSubstring_Regex_FirstRow_Irreplaceable_Nothing()
+    public void ReplaceCellWithSubstring_Regex_FirstRow_Irreplaceable_Nothing()
     {
         var expected = Helper.GetSampleTable();
         var actual = Helper.GetSampleTable();
@@ -128,13 +128,13 @@ public class ReplaceCellWithSubstring
             new(0, 2, "C1")
         };
 
-        actual.ReplaceCellsWithSubstring(@"\s", "!", true, firstRow);
+        actual.ReplaceCellWithSubstring(@"\s", "!", true, firstRow);
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
 
     [TestMethod]
-    public void ReplaceCellSubstring_Regex_AllCells_Replaceable_Grouped_Replaced()
+    public void ReplaceCellWithSubstring_Regex_AllCells_Replaceable_Grouped_Replaced()
     {
         ObservableTable<string> expected = new(
             new string[] { "A0", "B0", "C0" },
@@ -143,7 +143,7 @@ public class ReplaceCellWithSubstring
         );
         var actual = Helper.GetSampleTable();
 
-        actual.ReplaceCellsWithSubstring(@"^\w(\d)$", "$1$1", true);
+        actual.ReplaceCellWithSubstring(@"^\w(\d)$", "$1$1", true);
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
