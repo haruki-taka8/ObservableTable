@@ -216,30 +216,24 @@ public class ObservableTable<T>
         Records[cell.Row][cell.Column] = cell.Value;
     }
 
-    private static IEnumerable<Cell<T>> ReplacedCells(T from, T to, IEnumerable<Cell<T>> cells)
+    public IEnumerable<Cell<T>> FindCell(T value, IEnumerable<Cell<T>>? cells = null)
     {
-        if (from is null) { yield break; }
-
-        foreach (var cell in cells)
-        {
-            if (!from.Equals(cell.Value)) { continue; }
-
-            Cell<T> newCell = new(cell.Row, cell.Column, to);
-            yield return newCell;
-        }
+        cells ??= this.ToCells();
+        return cells.Where(x => Equals(x.Value, value));
     }
 
     public void ReplaceCell(T from, T to, IEnumerable<Cell<T>>? cells = null)
     {
-        cells ??= this.ListCells();
+        cells ??= this.ToCells();
 
-        var toChange = ReplacedCells(from, to, cells).ToList();
-        SetCell(toChange);
+        cells = cells.Replace(from, to);
+
+        SetCell(cells);
     }
 
     public void ReplaceCell(T from, T to, params Cell<T>[] cells)
     {
-        ReplaceCell(from, to, cells.ToList());
+        ReplaceCell(from, to, cells.AsEnumerable());
     }
 
     // Methods: History

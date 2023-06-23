@@ -3,7 +3,7 @@
 namespace UnitTest.Core;
 
 [TestClass]
-public class ReplaceCellSubstring
+public class ReplaceCellWithSubstring
 {
     [TestMethod]
     public void ReplaceCellSubstring_NoRegex_AllCells_Replaceable_Replaced()
@@ -15,7 +15,7 @@ public class ReplaceCellSubstring
         );
         var actual = Helper.GetSampleTable();
 
-        actual.ReplaceCellSubstring("A", "!");
+        actual.ReplaceCellsWithSubstring("A", "!");
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
@@ -26,7 +26,7 @@ public class ReplaceCellSubstring
         var expected = Helper.GetSampleTable();
         var actual = Helper.GetSampleTable();
 
-        actual.ReplaceCellSubstring("foobar", "!");
+        actual.ReplaceCellsWithSubstring("foobar", "!");
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
@@ -47,7 +47,7 @@ public class ReplaceCellSubstring
             new(0, 2, "C1")
         };
 
-        actual.ReplaceCellSubstring("1", "!", false, firstRow);
+        actual.ReplaceCellsWithSubstring("1", "!", false, firstRow);
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
@@ -64,11 +64,10 @@ public class ReplaceCellSubstring
             new(0, 2, "C1")
         };
 
-        actual.ReplaceCellSubstring("foobar", "!", false, firstRow);
+        actual.ReplaceCellsWithSubstring("foobar", "!", false, firstRow);
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
-
 
     [TestMethod]
     public void ReplaceCellSubstring_Regex_AllCells_Replaceable_Replaced()
@@ -80,7 +79,7 @@ public class ReplaceCellSubstring
         );
         var actual = Helper.GetSampleTable();
 
-        actual.ReplaceCellSubstring(@"\d", "!", true);
+        actual.ReplaceCellsWithSubstring(@"\d", "!", true);
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
@@ -91,7 +90,7 @@ public class ReplaceCellSubstring
         var expected = Helper.GetSampleTable();
         var actual = Helper.GetSampleTable();
 
-        actual.ReplaceCellSubstring(@"\s", "!", true);
+        actual.ReplaceCellsWithSubstring(@"\s", "!", true);
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
@@ -112,7 +111,7 @@ public class ReplaceCellSubstring
             new(0, 2, "C1")
         };
 
-        actual.ReplaceCellSubstring(@"\d", "!", true, firstRow);
+        actual.ReplaceCellsWithSubstring(@"\d", "!", true, firstRow);
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
@@ -129,7 +128,7 @@ public class ReplaceCellSubstring
             new(0, 2, "C1")
         };
 
-        actual.ReplaceCellSubstring(@"\s", "!", true, firstRow);
+        actual.ReplaceCellsWithSubstring(@"\s", "!", true, firstRow);
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
@@ -144,8 +143,7 @@ public class ReplaceCellSubstring
         );
         var actual = Helper.GetSampleTable();
 
-
-        actual.ReplaceCellSubstring(@"^\w(\d)$", "$1$1", true);
+        actual.ReplaceCellsWithSubstring(@"^\w(\d)$", "$1$1", true);
 
         Assert.IsTrue(expected.ContentEquals(actual));
     }
