@@ -352,7 +352,7 @@ public class Redo
         var expected = Helper.GetSampleTable();
         var actual = Helper.GetSampleTable();
 
-        actual.ReplaceCellSubstring(@"\d", "!", true);
+        actual.ReplaceCellsWithSubstring(@"\d", "!", true);
         Assert.IsFalse(expected.ContentEquals(actual));
 
         actual.Undo();
