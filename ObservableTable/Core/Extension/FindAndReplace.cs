@@ -1,10 +1,11 @@
 ﻿using System.Text.RegularExpressions;
+using ObservableTable.Core;
 
 namespace ObservableTable.Core;
 
-public static class Extension
+public static class FindAndReplace
 {
-    public static IEnumerable<Cell<string>> FindCellsWithSubstring(this ObservableTable<string> table, string value, bool matchRegex = false, IEnumerable<Cell<string>>? cells = null)
+    public static IEnumerable<Cell<string>> FindCellWithSubstring(this ObservableTable<string> table, string value, bool matchRegex = false, IEnumerable<Cell<string>>? cells = null)
     {
         bool MatchRegex(Cell<string> cell)
         {
@@ -42,16 +43,16 @@ public static class Extension
             .Select(x => matchRegex ? ReplaceRegex(x) : ReplaceLiteral(x));
     }
 
-    public static void ReplaceCellsWithSubstring(this ObservableTable<string> table, string from, string to, bool matchRegex = false, IEnumerable<Cell<string>>? cells = null)
+    public static void ReplaceCellWithSubstring(this ObservableTable<string> table, string from, string to, bool matchRegex = false, IEnumerable<Cell<string>>? cells = null)
     {
-        cells = table.FindCellsWithSubstring(from, matchRegex, cells);
+        cells = table.FindCellWithSubstring(from, matchRegex, cells);
 
         var toChange = cells.Replace(from, to, matchRegex);
         table.SetCell(toChange);
     }
 
-    public static void ReplaceCellSubstring(this ObservableTable<string> table, string from, string to, bool matchRegex = false, params Cell<string>[] cells)
+    public static void ReplaceCellWithSubstring(this ObservableTable<string> table, string from, string to, bool matchRegex = false, params Cell<string>[] cells)
     {
-        table.ReplaceCellsWithSubstring(from, to, matchRegex, cells.AsEnumerable());
+        table.ReplaceCellWithSubstring(from, to, matchRegex, cells.AsEnumerable());
     }
 }

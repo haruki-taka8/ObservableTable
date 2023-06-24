@@ -45,11 +45,6 @@ public class ObservableTable<T>
         }
     }
 
-    public void InsertRow(int index, params IList<T?>[] rows)
-    {
-        InsertRow(index, rows.AsEnumerable());
-    }
-
     private void InsertRow(int index, IList<T?> row)
     {
         row = row.PadRight(headers.Count);
@@ -71,11 +66,6 @@ public class ObservableTable<T>
             parity--;
             RemoveRow(row);
         }
-    }
-
-    public void RemoveRow(params ObservableCollection<T?>[] rows)
-    {
-        RemoveRow(rows.AsEnumerable());
     }
 
     private void RemoveRow(ObservableCollection<T?> row)
@@ -135,11 +125,6 @@ public class ObservableTable<T>
         }
     }
 
-    public void InsertColumn(int index, params Column<T>[] columns)
-    {
-        InsertColumn(index, columns.AsEnumerable());
-    }
-
     private void InsertColumn(int index, Column<T> column)
     {
         var values = column.Values.PadRight(Records.Count);
@@ -165,11 +150,6 @@ public class ObservableTable<T>
             parity--;
             RemoveColumn(header);
         }
-    }
-
-    public void RemoveColumn(params T[] headers)
-    {
-        RemoveColumn(headers.AsEnumerable());
     }
 
     private void RemoveColumn(T header)
@@ -205,11 +185,6 @@ public class ObservableTable<T>
         }
     }
 
-    public void SetCell(params Cell<T>[] cells)
-    {
-        SetCell(cells.AsEnumerable());
-    }
-
     private void SetCell(Cell<T> cell)
     {
         // Let RecordChanged record the transaction
@@ -229,11 +204,6 @@ public class ObservableTable<T>
         cells = cells.Replace(from, to);
 
         SetCell(cells);
-    }
-
-    public void ReplaceCell(T from, T to, params Cell<T>[] cells)
-    {
-        ReplaceCell(from, to, cells.AsEnumerable());
     }
 
     // Methods: History
