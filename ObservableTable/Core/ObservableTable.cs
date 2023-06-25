@@ -45,7 +45,7 @@ public class ObservableTable<T>
         parity = 0;
     }
 
-    private void InsertRow(int index, IList<T?> row)
+    public void InsertRow(int index, IList<T?> row)
     {
         row = row.PadRight(headers.Count);
         ObservableCollection<T?> toAdd = new(row);
@@ -68,7 +68,7 @@ public class ObservableTable<T>
         parity = 0;
     }
 
-    private void RemoveRow(ObservableCollection<T?> row)
+    public void RemoveRow(ObservableCollection<T?> row)
     {
         int index = Records.IndexOf(row);
         Records.Remove(row);
@@ -125,7 +125,7 @@ public class ObservableTable<T>
         parity = 0;
     }
 
-    private void InsertColumn(int index, Column<T> column)
+    public void InsertColumn(int index, Column<T> column)
     {
         var values = column.Values.PadRight(Records.Count);
 
@@ -152,7 +152,7 @@ public class ObservableTable<T>
         parity = 0;
     }
 
-    private void RemoveColumn(T header)
+    public void RemoveColumn(T header)
     {
         // Remove header first to prevent binding failures
         int index = headers.IndexOf(header);
@@ -185,7 +185,7 @@ public class ObservableTable<T>
         parity = 0;
     }
 
-    private void SetCell(Cell<T> cell)
+    public void SetCell(Cell<T> cell)
     {
         // Let RecordChanged record the transaction
         Records[cell.Row][cell.Column] = cell.Value;
@@ -207,7 +207,7 @@ public class ObservableTable<T>
     }
 
     // Methods: History
-    internal void RecordChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void RecordChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (
             e.Action != NotifyCollectionChangedAction.Replace
