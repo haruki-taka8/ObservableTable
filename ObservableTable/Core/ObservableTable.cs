@@ -37,12 +37,12 @@ public class ObservableTable<T>
     // Methods: Record modifications
     public void InsertRow(int index, IEnumerable<IList<T?>> rows)
     {
-        parity = rows.Count();
         foreach (var row in rows)
         {
-            parity--;
             InsertRow(index++, row);
+            parity++;
         }
+        parity = 0;
     }
 
     private void InsertRow(int index, IList<T?> row)
@@ -60,12 +60,12 @@ public class ObservableTable<T>
 
     public void RemoveRow(IEnumerable<ObservableCollection<T?>> rows)
     {
-        parity = rows.Count();
         foreach (var row in rows)
         {
-            parity--;
             RemoveRow(row);
+            parity++;
         }
+        parity = 0;
     }
 
     private void RemoveRow(ObservableCollection<T?> row)
@@ -117,12 +117,12 @@ public class ObservableTable<T>
 
     public void InsertColumn(int index, IEnumerable<Column<T>> columns)
     {
-        parity = columns.Count();
         foreach (var column in columns)
         {
-            parity--;
             InsertColumn(index++, column);
+            parity++;
         }
+        parity = 0;
     }
 
     private void InsertColumn(int index, Column<T> column)
@@ -144,12 +144,12 @@ public class ObservableTable<T>
 
     public void RemoveColumn(IEnumerable<T> headers)
     {
-        parity = headers.Count();
         foreach (var header in headers)
         {
-            parity--;
             RemoveColumn(header);
+            parity++;
         }
+        parity = 0;
     }
 
     private void RemoveColumn(T header)
@@ -177,12 +177,12 @@ public class ObservableTable<T>
 
     public void SetCell(IEnumerable<Cell<T>> cells)
     {
-        parity = cells.Count();
         foreach (var cell in cells)
         {
-            parity--;
             SetCell(cell);
+            parity++;
         }
+        parity = 0;
     }
 
     private void SetCell(Cell<T> cell)
@@ -245,7 +245,7 @@ public class ObservableTable<T>
 
     private void ProcessHistory(ref Stack<Edit> stack, ref Stack<Edit> opposite, bool isUndo)
     {
-        int offset = isUndo ? -1 : 1;
+        int offset = isUndo ? 1 : -1;
 
         while (stack.TryPop(out Edit last))
         {

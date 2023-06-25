@@ -189,6 +189,27 @@ public class Undo
     }
 
     [TestMethod]
+    public void Undo_MixParity_SomeOperationsReverted()
+    {
+        var expected = Helper.GetSampleTable();
+        var actual = Helper.GetSampleTable();
+
+        actual.InsertRow(0, Array.Empty<string?>());
+        actual.InsertRow(0, Array.Empty<string?>());
+        Assert.IsFalse(expected.ContentEquals(actual));
+
+        actual.Undo();
+        Assert.IsFalse(expected.ContentEquals(actual));
+        Assert.IsTrue(actual.UndoCount == 1);
+        Assert.IsTrue(actual.RedoCount == 1);
+
+        actual.Undo();
+        Assert.IsTrue(expected.ContentEquals(actual));
+        Assert.IsTrue(actual.UndoCount == 0);
+        Assert.IsTrue(actual.RedoCount == 2);
+    }
+
+    [TestMethod]
     public void Undo_Mix_SomeOperationsReverted()
     {
         var expected = Helper.GetSampleTable();
