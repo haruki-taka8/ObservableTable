@@ -10,7 +10,7 @@ public class ObservableTable<T>
     public ReadOnlyObservableCollection<T> Headers => new(headers);
     public int UndoCount => undo.Count;
     public int RedoCount => redo.Count;
-    public event EventHandler? TableModified;
+    public event EventHandler<ModificationEventArgs>? TableModified;
 
     private readonly ObservableCollection<T> headers = new();
     private Stack<Edit> undo = new();
@@ -229,10 +229,11 @@ public class ObservableTable<T>
 
     private void RecordTransaction(Action undoAction, Action redoAction)
     {
-        TableModified?.Invoke(this, new());
+        Edit edit = new(undoAction, redoAction, parity);
+        TableModified?.Invoke(this, new(edit));
 
         if (!recordTransactions) { return; }
-        undo.Push(new(undoAction, redoAction, parity));
+        undo.Push(edit);
         redo.Clear();
     }
 

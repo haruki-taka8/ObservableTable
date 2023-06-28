@@ -1,131 +1,163 @@
 ﻿using ObservableTable.Core;
+using System.Data;
 
 namespace UnitTest.Core;
 
 [TestClass]
 public class EventHandler
 {
+    private readonly static ObservableTable<string> original = Helper.GetSampleTable();
+
+    private void SingleHandler(object? sender, ModificationEventArgs e)
+    {
+        var table = (ObservableTable<string>)sender!;
+        table.TableModified -= SingleHandler;
+
+        Assert.AreEqual(e.Parity, 0);
+
+        e.OppositeAction.Invoke();
+        Assert.IsTrue(original.ContentEquals(table));
+
+        e.Action.Invoke();
+        Assert.IsFalse(original.ContentEquals(table));
+
+        e.OppositeAction.Invoke();
+        Assert.IsTrue(original.ContentEquals(table));
+    }
+
     [TestMethod]
     public void EventHandler_SetCell_Notified()
     {
-        var table = Helper.GetSampleTable();
-        var modified = false;
+        var actual = Helper.GetSampleTable();
 
-        table.TableModified += (object? sender, EventArgs e) => modified = true;
-
-        table.SetCell(new Cell<string>(0, 0, "A1"));
-        Assert.IsTrue(modified);
+        actual.TableModified += SingleHandler;
+        actual.SetCell(new Cell<string>(0, 0, "A1!"));
     }
 
 
     [TestMethod]
     public void EventHandler_RenameColumn_Notified()
     {
-        var table = Helper.GetSampleTable();
-        var modified = false;
+        var actual = Helper.GetSampleTable();
 
-        table.TableModified += (object? sender, EventArgs e) => modified = true;
-
-        table.RenameColumn(0, "H0");
-        Assert.IsTrue(modified);
+        actual.TableModified += SingleHandler;
+        actual.RenameColumn(0, "H0");
     }
 
     [TestMethod]
     public void EventHandler_InsertRow_Notified()
     {
-        var table = Helper.GetSampleTable();
-        var modified = false;
+        var actual = Helper.GetSampleTable();
 
-        table.TableModified += (object? sender, EventArgs e) => modified = true;
-
-        table.InsertRow(0, new List<string?>());
-        Assert.IsTrue(modified);
+        actual.TableModified += SingleHandler;
+        actual.InsertRow(0, new List<string?>());
     }
 
     [TestMethod]
     public void EventHandler_RemoveRow_Notified()
     {
-        var table = Helper.GetSampleTable();
-        var modified = false;
+        var actual = Helper.GetSampleTable();
 
-        table.TableModified += (object? sender, EventArgs e) => modified = true;
-
-        table.RemoveRow(table.Records[0]);
-        Assert.IsTrue(modified);
+        actual.TableModified += SingleHandler;
+        actual.RemoveRow(actual.Records[0]);
     }
 
     [TestMethod]
     public void EventHandler_InsertColumn_Notified()
     {
-        var table = Helper.GetSampleTable();
-        var modified = false;
+        var actual = Helper.GetSampleTable();
 
-        table.TableModified += (object? sender, EventArgs e) => modified = true;
-
-        table.InsertColumn(0, new Column<string>("A0"));
-        Assert.IsTrue(modified);
+        actual.TableModified += SingleHandler;
+        actual.InsertColumn(0, new Column<string>("A0"));
     }
 
     [TestMethod]
     public void EventHandler_RemoveColumn_Notified()
     {
-        var table = Helper.GetSampleTable();
-        var modified = false;
+        var actual = Helper.GetSampleTable();
 
-        table.TableModified += (object? sender, EventArgs e) => modified = true;
-
-        table.RemoveColumn("A0");
-        Assert.IsTrue(modified);
+        actual.TableModified += SingleHandler;
+        actual.RemoveColumn("A0");
     }
 
     [TestMethod]
     public void EventHandler_ReorderRow_Notified()
     {
-        var table = Helper.GetSampleTable();
-        var modified = false;
+        var actual = Helper.GetSampleTable();
 
-        table.TableModified += (object? sender, EventArgs e) => modified = true;
-
-        table.ReorderRow(0,1);
-        Assert.IsTrue(modified);
+        actual.TableModified += SingleHandler;
+        actual.ReorderRow(0,1);
     }
 
     [TestMethod]
     public void EventHandler_ReorderColumn_Notified()
     {
-        var table = Helper.GetSampleTable();
-        var modified = false;
+        var actual = Helper.GetSampleTable();
 
-        table.TableModified += (object? sender, EventArgs e) => modified = true;
+        actual.TableModified += SingleHandler;
+        actual.ReorderColumn(0, 1);
+    }
 
-        table.ReorderColumn(0, 1);
-        Assert.IsTrue(modified);
+    [TestMethod]
+    public void EventHandler_ReplaceCell_Notified()
+    {
+        var actual = Helper.GetSampleTable();
+
+        actual.TableModified += SingleHandler;
+        actual.ReplaceCell(actual.Records[0][0]!, "");
     }
 
     [TestMethod]
     public void EventHandler_Undo_Notified()
     {
-        var table = Helper.GetSampleTable();
-        int modified = 0;
+        static void Undo_SingleHandler(object? sender, ModificationEventArgs e)
+        {
+            var table = (ObservableTable<string>)sender!;
+            table.TableModified -= Undo_SingleHandler;
 
-        table.TableModified += (object? sender, EventArgs e) => modified++;
+            Assert.AreEqual(e.Parity, 0);
 
-        table.RenameColumn(0, "H0");
-        table.Undo();
-        Assert.IsTrue(modified == 2);
+            e.OppositeAction.Invoke();
+            Assert.IsFalse(original.ContentEquals(table));
+
+            e.Action.Invoke();
+            Assert.IsTrue(original.ContentEquals(table));
+
+            e.OppositeAction.Invoke();
+            Assert.IsFalse(original.ContentEquals(table));
+        }
+
+        var actual = Helper.GetSampleTable();
+        actual.RenameColumn(0, "H0");
+
+        actual.TableModified += Undo_SingleHandler;
+        actual.Undo();
     }
 
     [TestMethod]
     public void EventHandler_Redo_Notified()
     {
-        var table = Helper.GetSampleTable();
-        int modified = 0;
+        var actual = Helper.GetSampleTable();
+        actual.RenameColumn(0, "H0");
+        actual.Undo();
 
-        table.TableModified += (object? sender, EventArgs e) => modified++;
+        actual.TableModified += SingleHandler;
+        actual.Redo();
+    }
 
-        table.RenameColumn(0, "H0");
-        table.Undo();
-        table.Redo();
-        Assert.IsTrue(modified == 3);
+
+    [TestMethod]
+    public void EventHandler_Parity_Notified()
+    {
+        int[] expectedParity = new[] { 0, 1 };
+
+        var actual = Helper.GetSampleTable();
+        List<int> parity = new();
+
+        actual.TableModified += (object? sender, ModificationEventArgs e) => parity.Add(e.Parity);
+        List<List<string?>> rows = new() { new(), new() };
+        actual.InsertRow(0, rows);
+
+        Assert.IsTrue(Enumerable.SequenceEqual(parity, expectedParity));
     }
 }
