@@ -203,7 +203,7 @@ public class Output
     public void ToFile_HasHeader()
     {
         var table = Importer.FromFilePath(CsvFolder + "Quoted.csv", true);
-        Exporter.ToFile("temp.csv", table, true);
+        table.ToFile("temp.csv", true);
         var newTable = Importer.FromFilePath("temp.csv", true);
 
         Assert.IsTrue(table.ContentEquals(newTable));
@@ -213,7 +213,7 @@ public class Output
     public void ToFile_HasNoHeader()
     {
         var table = Importer.FromFilePath(CsvFolder + "Quoted.csv", false);
-        Exporter.ToFile("temp.csv", table, false);
+        table.ToFile("temp.csv", false);
         var newTable = Importer.FromFilePath("temp.csv", false);
 
         Assert.IsTrue(table.ContentEquals(newTable));
@@ -223,7 +223,7 @@ public class Output
     public void ToFile_Single_HasHeader()
     {
         var table = Importer.FromFilePath(CsvFolder + "Single.csv", true);
-        Exporter.ToFile("temp.csv", table, true);
+        table.ToFile("temp.csv", true);
         var newTable = Importer.FromFilePath("temp.csv", true);
 
         Assert.IsTrue(table.ContentEquals(newTable));
@@ -233,7 +233,7 @@ public class Output
     public void ToFile_Single_HasNoHeader()
     {
         var table = Importer.FromFilePath(CsvFolder + "Single.csv", false);
-        Exporter.ToFile("temp.csv", table, false);
+        table.ToFile("temp.csv", false);
         var newTable = Importer.FromFilePath("temp.csv", false);
 
         Assert.IsTrue(table.ContentEquals(newTable));
@@ -243,7 +243,7 @@ public class Output
     public void ToFile_Empty_HasHeader()
     {
         var table = Importer.FromFilePath(CsvFolder + "Empty.csv", true);
-        Exporter.ToFile("temp.csv", table, true);
+        table.ToFile("temp.csv", true);
         var newTable = Importer.FromFilePath("temp.csv", true);
 
         Assert.IsTrue(table.ContentEquals(newTable));
@@ -253,7 +253,7 @@ public class Output
     public void ToFile_Empty_HasNoHeader()
     {
         var table = Importer.FromFilePath(CsvFolder + "Empty.csv", false);
-        Exporter.ToFile("temp.csv", table, false);
+        table.ToFile("temp.csv", false);
         var newTable = Importer.FromFilePath("temp.csv", false);
 
         Assert.IsTrue(table.ContentEquals(newTable));

@@ -5,12 +5,19 @@ namespace ObservableTable.Core;
 
 public class ObservableTable<T>
 {
-    // Properties & Fields
+    #region Properties
+
+    // Records cannot be readonly because WPF and other implementations
+    // access cells directly rather than using SetCell().
     public ObservableCollection<ObservableCollection<T?>> Records { get; } = new();
     public ReadOnlyObservableCollection<T> Headers => new(headers);
     public int UndoCount => undo.Count;
     public int RedoCount => redo.Count;
     public event EventHandler<ModificationEventArgs>? TableModified;
+
+    #endregion Properties
+
+    #region Fields
 
     private readonly ObservableCollection<T> headers = new();
     private Stack<Edit> undo = new();
@@ -18,12 +25,23 @@ public class ObservableTable<T>
     private bool recordTransactions;
     private int parity;
 
-    // Constructors
+    #endregion Fields
+
+    #region Constructors
+
+    /// <summary>
+    /// Initialize an ObservableTable without any columns or rows.
+    /// </summary>
     public ObservableTable()
     {
         recordTransactions = true;
     }
 
+    /// <summary>
+    /// Initialize an ObservableTable with predefined columns and rows.
+    /// </summary>
+    /// <param name="headers">Columns to add</param>
+    /// <param name="records">Rows to add</param>
     public ObservableTable(IEnumerable<T> headers, IEnumerable<IList<T?>> records)
     {
         this.headers = new(headers);
@@ -31,10 +49,21 @@ public class ObservableTable<T>
         recordTransactions = true;
     }
 
+    /// <summary>
+    /// Initialize an ObservableTable with predefined columns and rows.
+    /// </summary>
+    /// <param name="headers">Columns to add</param>
+    /// <param name="records">Rows to add (optional)</param>
     public ObservableTable(IEnumerable<T> headers, params IList<T?>[] records) : this(headers, records.AsEnumerable())
     { }
 
-    // Methods: Record modifications
+    #endregion Constructors
+
+    #region Public Methods
+
+    /// <summary>
+    /// Insert <paramref name="rows"/> starting from <paramref name="index"/>.
+    /// </summary>
     public void InsertRow(int index, IEnumerable<IList<T?>> rows)
     {
         foreach (var row in rows)
@@ -45,6 +74,9 @@ public class ObservableTable<T>
         parity = 0;
     }
 
+    /// <summary>
+    /// Insert <paramref name="row"/> at <paramref name="index"/>
+    /// </summary>
     public void InsertRow(int index, IList<T?> row)
     {
         row = row.PadRight(headers.Count);
@@ -58,6 +90,9 @@ public class ObservableTable<T>
         );
     }
 
+    /// <summary>
+    /// Remove <paramref name="rows"/> from the table. Non-existent rows are ignored.
+    /// </summary>
     public void RemoveRow(IEnumerable<ObservableCollection<T?>> rows)
     {
         foreach (var row in rows)
@@ -68,6 +103,9 @@ public class ObservableTable<T>
         parity = 0;
     }
 
+    /// <summary>
+    /// Remove <paramref name="row"/> from the table. An non-existent row is ignored.
+    /// </summary>
     public void RemoveRow(ObservableCollection<T?> row)
     {
         int index = Records.IndexOf(row);
@@ -79,6 +117,9 @@ public class ObservableTable<T>
         );
     }
 
+    /// <summary>
+    /// Move a row from <paramref name="oldIndex"/> to <paramref name="newIndex"/>.
+    /// </summary>
     public void ReorderRow(int oldIndex, int newIndex)
     {
         Records.Move(oldIndex, newIndex);
@@ -89,6 +130,9 @@ public class ObservableTable<T>
         );
     }
 
+    /// <summary>
+    /// Move a column from <paramref name="oldIndex"/> to <paramref name="newIndex"/>.
+    /// </summary>
     public void ReorderColumn(int oldIndex, int newIndex)
     {
         headers.Move(oldIndex, newIndex);
@@ -104,6 +148,9 @@ public class ObservableTable<T>
         );
     }
 
+    /// <summary>
+    /// Rename the column at <paramref name="index"/> to <paramref name="header"/>.
+    /// </summary>
     public void RenameColumn(int index, T header)
     {
         T oldHeader = headers[index];
@@ -115,6 +162,9 @@ public class ObservableTable<T>
         );
     }
 
+    /// <summary>
+    /// Insert <paramref name="columns"/> starting from <paramref name="index"/>.
+    /// </summary>
     public void InsertColumn(int index, IEnumerable<Column<T>> columns)
     {
         foreach (var column in columns)
@@ -125,6 +175,9 @@ public class ObservableTable<T>
         parity = 0;
     }
 
+    /// <summary>
+    /// Insert <paramref name="column"/> at <paramref name="index"/>.
+    /// </summary>
     public void InsertColumn(int index, Column<T> column)
     {
         var values = column.Values.PadRight(Records.Count);
@@ -142,6 +195,10 @@ public class ObservableTable<T>
         );
     }
 
+    /// <summary>
+    /// Remove <paramref name="columns"/>.
+    /// </summary>
+    /// <exception cref="IndexOutOfRangeException">A column does not exist.</exception>
     public void RemoveColumn(IEnumerable<T> headers)
     {
         foreach (var header in headers)
@@ -152,6 +209,10 @@ public class ObservableTable<T>
         parity = 0;
     }
 
+    /// <summary>
+    /// Remove <paramref name="column"/>.
+    /// </summary>
+    /// <exception cref="IndexOutOfRangeException">A column does not exist.</exception>
     public void RemoveColumn(T header)
     {
         // Remove header first to prevent binding failures
@@ -166,15 +227,9 @@ public class ObservableTable<T>
         );
     }
 
-    private IEnumerable<T?> RemoveColumn(int index)
-    {
-        foreach (var record in Records)
-        {
-            yield return record[index];
-            record.RemoveAt(index);
-        }
-    }
-
+    /// <summary>
+    /// Apply the values in <paramref name="cells"/> to the table.
+    /// </summary>
     public void SetCell(IEnumerable<Cell<T>> cells)
     {
         foreach (var cell in cells)
@@ -185,18 +240,30 @@ public class ObservableTable<T>
         parity = 0;
     }
 
+    /// <summary>
+    /// Apply the value in <paramref name="cell"/> to the table.
+    /// </summary>
     public void SetCell(Cell<T> cell)
     {
         // Let RecordChanged record the transaction
         Records[cell.Row][cell.Column] = cell.Value;
     }
 
+    /// <summary>
+    /// Find <paramref name="value"/> in the designated <paramref name="cells"/>.
+    /// </summary>
+    /// <param name="cells">Range of cell to perform the lookup. Skip to indicate whole table.</param>
+    /// <returns>An enumerable of <see cref="Cell{T}"/> having <paramref name="value"/></returns>
     public IEnumerable<Cell<T>> FindCell(T value, IEnumerable<Cell<T>>? cells = null)
     {
         cells ??= this.ToCells();
         return cells.Where(x => Equals(x.Value, value));
     }
 
+    /// <summary>
+    /// Replace <paramref name="from"/> with <paramref name="to"/> in the designated <paramref name="cells"/>.
+    /// </summary>
+    /// <param name="cells">Range of cell to perform the lookup. Skip to indicate whole table.</param>
     public void ReplaceCell(T from, T to, IEnumerable<Cell<T>>? cells = null)
     {
         cells ??= this.ToCells();
@@ -206,7 +273,42 @@ public class ObservableTable<T>
         SetCell(cells);
     }
 
-    // Methods: History
+    /// <summary>
+    /// Undo the last transaction. Nothing happens if there are nothing to undo.
+    /// </summary>
+    public void Undo()
+    {
+        ProcessHistory(ref undo, ref redo, true);
+    }
+
+    /// <summary>
+    /// Redo the last transaction. Nothing happens if there are nothing to redo.
+    /// </summary>
+    public void Redo()
+    {
+        ProcessHistory(ref redo, ref undo, false);
+    }
+
+    #endregion Public Methods
+
+    #region Private Methods
+
+    /// <summary>
+    /// Removes a column at <paramref name="index"/>.
+    /// </summary>
+    /// <returns>The removed column</returns>
+    private IEnumerable<T?> RemoveColumn(int index)
+    {
+        foreach (var record in Records)
+        {
+            yield return record[index];
+            record.RemoveAt(index);
+        }
+    }
+
+    /// <summary>
+    /// Provides history-handling for SetCell() and direct cell access (Records[y][x] = ...)
+    /// </summary>
     private void RecordChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (
@@ -214,7 +316,6 @@ public class ObservableTable<T>
             || sender is null
         ) { return; }
 
-        // Handles inline changes
         var record = (ObservableCollection<T?>)sender;
         int row = Records.IndexOf(record);
         int column = e.OldStartingIndex;
@@ -227,6 +328,11 @@ public class ObservableTable<T>
         );
     }
 
+    /// <summary>
+    /// Push a transaction to the history stack and invoke the TableModified event.
+    /// </summary>
+    /// <param name="undoAction">Action to reverse the transaction</param>
+    /// <param name="redoAction">Action that caused this transaction</param>
     private void RecordTransaction(Action undoAction, Action redoAction)
     {
         Edit edit = new(undoAction, redoAction, parity);
@@ -237,6 +343,9 @@ public class ObservableTable<T>
         redo.Clear();
     }
 
+    /// <summary>
+    /// Undo/redo a transaction without modifying the history stacks.
+    /// </summary>
     private void RevertHistory(Edit edit, bool isUndo)
     {
         recordTransactions = false;
@@ -244,6 +353,11 @@ public class ObservableTable<T>
         recordTransactions = true;
     }
 
+    /// <summary>
+    /// Handle both undo and redo with similar logic.
+    /// </summary>
+    /// <param name="stack">An undo or redo stack.</param>
+    /// <param name="opposite">The stack opposite to <paramref name="stack"/> (i.e. redo if <paramref name="stack"/> is undo, and vice versa)</param>
     private void ProcessHistory(ref Stack<Edit> stack, ref Stack<Edit> opposite, bool isUndo)
     {
         int offset = isUndo ? 1 : -1;
@@ -258,13 +372,5 @@ public class ObservableTable<T>
         }
     }
 
-    public void Undo()
-    {
-        ProcessHistory(ref undo, ref redo, true);
-    }
-
-    public void Redo()
-    {
-        ProcessHistory(ref redo, ref undo, false);
-    }
+    #endregion Private Methods
 }

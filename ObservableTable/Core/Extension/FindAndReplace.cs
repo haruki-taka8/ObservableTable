@@ -1,10 +1,15 @@
 ﻿using System.Text.RegularExpressions;
-using ObservableTable.Core;
 
 namespace ObservableTable.Core;
 
 public static class FindAndReplace
 {
+    /// <summary>
+    /// Extension methods for ObservableTable{string}
+    /// These methods work similarly to the generic version, 
+    /// but these accept partial matches and regular expression matches.
+    /// </summary>
+
     public static IEnumerable<Cell<string>> FindCellWithSubstring(this ObservableTable<string> table, string value, bool matchRegex = false, IEnumerable<Cell<string>>? cells = null)
     {
         bool MatchRegex(Cell<string> cell)
