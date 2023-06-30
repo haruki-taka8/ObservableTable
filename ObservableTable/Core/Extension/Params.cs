@@ -4,6 +4,12 @@ namespace ObservableTable.Core;
 
 public static class Params
 {
+    /// <summary>
+    /// These extension methods accept params instead of IEnumerable<>,
+    /// providing flexibility for consumers.
+    /// They are wrappers to, and functionally identical to, the built-in methods.
+    /// </summary>
+    
     public static void InsertRow<T>(this ObservableTable<T> table, int index, params IList<T?>[] rows)
     {
         table.InsertRow(index, rows.AsEnumerable());

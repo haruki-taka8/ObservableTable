@@ -6,13 +6,16 @@ using ObservableTable.Core;
 namespace ObservableTable.IO;
 
 public static class Importer
-{
+{    
     private static readonly CsvConfiguration configuration = new(CultureInfo.InvariantCulture)
     {
         MissingFieldFound = null,
         BadDataFound = null
     };
 
+    /// <summary>
+    /// Read from a file and convert its content into a jagged array.
+    /// </summary>
     private static IEnumerable<IList<string?>> GetRecords(string path)
     {
         using StreamReader streamReader = new(path);
@@ -25,45 +28,41 @@ public static class Importer
         }
     }
 
-    private static IEnumerable<string> FillNull(IEnumerable<string?> row)
+    /// <summary>
+    /// Replace all instances of null with an empty string in a row.
+    /// </summary>
+    private static IEnumerable<string> RemoveNull(IEnumerable<string?> row)
     {
-        foreach (var item in row)
-        {
-            yield return item ?? "";
-        }
+        return row.Where(x => x is not null)!;
     }
 
+    /// <summary>
+    /// Yields an enumerable of unique numbers that can be used as placeholder headers.
+    /// </summary>
     private static IEnumerable<string> GetNumberedHeaders(int count)
     {
-        for (int i = 0; i < count; i++)
-        {
-            yield return i.ToString();
-        }
+        return Enumerable
+            .Range(0, count)
+            .Select(x => x.ToString());
     }
 
-    private static ObservableTable<string> NewTableWithHeader(IList<IList<string?>> records)
-    {
-        var headers = FillNull(records[0]);
-        records.RemoveAt(0);
-
-        return new(headers, records);
-    }
-
-    private static ObservableTable<string> NewTableWithoutHeader(IList<IList<string?>> records)
-    {
-        var headers = GetNumberedHeaders(records[0].Count);
-
-        return new(headers, records);
-    }
-
+    /// <summary>
+    /// Public method allowing consumers to convert a CSV file to an ObservableTable{string}.
+    /// </summary>
+    /// <param name="hasHeader">Whether the file has headers or not. If not, numbered headers are generated.</param>
+    /// <returns></returns>
     public static ObservableTable<string> FromFilePath(string path, bool hasHeader = true)
     {
         var records = GetRecords(path).ToList();
 
-        if (records.Count == 0) { return new(); }
+        var firstRow = records.FirstOrDefault() ?? new List<string?>();
 
-        return hasHeader
-               ? NewTableWithHeader(records)
-               : NewTableWithoutHeader(records);
+        var headers = hasHeader
+            ? RemoveNull(firstRow)
+            : GetNumberedHeaders(firstRow.Count);
+
+        if (hasHeader) { records.Remove(firstRow); }
+
+        return new(headers, records);
     }
 }

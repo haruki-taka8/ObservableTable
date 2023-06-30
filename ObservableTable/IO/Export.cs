@@ -4,19 +4,30 @@ namespace ObservableTable.IO;
 
 public static class Exporter
 {
+    /// <summary>
+    /// Converts an enumerable to a CSV row, fully quoted.
+    /// </summary>
     private static string ConcatenateList(IEnumerable<string?> list)
     {
         if (!list.Any()) { return ""; }
         return '"' + string.Join("\",\"", list) + '"';
     }
 
-    public static string ToCsvString(ObservableTable<string> table, bool hasHeader = true)
+    /// <summary>
+    /// Converts an ObservableTable{string} to a multi-line CSV string.
+    /// </summary>
+    /// <param name="hasHeader">If true, the headers of the table will be included.</param>
+    public static string ToCsvString(this ObservableTable<string> table, bool hasHeader = true)
     {
         var output = ToIEnumerable(table, hasHeader);
         return string.Join(Environment.NewLine, output);
     }
 
-    public static IEnumerable<string> ToIEnumerable(ObservableTable<string> table, bool hasHeader)
+    /// <summary>
+    /// Converts an ObservableTable{string} to a a jagged array.
+    /// </summary>
+    /// <param name="hasHeader">If true, the headers of the table will be included.</param>
+    public static IEnumerable<string> ToIEnumerable(this ObservableTable<string> table, bool hasHeader)
     {
         if (hasHeader)
         {
@@ -29,9 +40,24 @@ public static class Exporter
         }
     }
 
-    public static void ToFile(string path, ObservableTable<string> table, bool hasHeader = true)
+    /// <summary>
+    /// Converts an ObservableTable{string} to a multi-line CSV file.
+    /// </summary>
+    /// <param name="hasHeader">If true, the headers of the table will be written to the file.</param>
+    public static void ToFile(this ObservableTable<string> table, string path, bool hasHeader = true)
     {
         var content = ToCsvString(table, hasHeader);
         File.WriteAllText(path, content);
+    }
+
+
+    /// <summary>
+    /// Converts an ObservableTable{string} to a multi-line CSV file.
+    /// </summary>
+    /// <param name="hasHeader">If true, the headers of the table will be written to the file.</param>
+    [Obsolete("Use extension method .ToFile() instead. This method will be phased out in/after 2024.")]
+    public static void ToFile(string path, ObservableTable<string> table, bool hasHeader = true)
+    {
+        table.ToFile(path, hasHeader);
     }
 }
