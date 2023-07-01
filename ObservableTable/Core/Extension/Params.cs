@@ -15,7 +15,7 @@ public static class Params
         table.InsertRow(index, rows.AsEnumerable());
     }
 
-    public static void RemoveRow<T>(this ObservableTable<T> table, params ObservableCollection<T?>[] rows)
+    public static void RemoveRow<T>(this ObservableTable<T> table, params IList<T?>[] rows)
     {
         table.RemoveRow(rows.AsEnumerable());
     }
