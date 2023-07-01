@@ -85,7 +85,7 @@ public class ObservableTable<T>
         Records.Insert(index, toAdd);
 
         RecordTransaction(
-            () => RemoveRow(Records[index]),
+            () => RemoveRow(row),
             () => InsertRow(index, row)
         );
     }
@@ -93,7 +93,7 @@ public class ObservableTable<T>
     /// <summary>
     /// Remove <paramref name="rows"/> from the table. Non-existent rows are ignored.
     /// </summary>
-    public void RemoveRow(IEnumerable<ObservableCollection<T?>> rows)
+    public void RemoveRow(IEnumerable<IList<T?>> rows)
     {
         foreach (var row in rows)
         {
@@ -103,18 +103,18 @@ public class ObservableTable<T>
         parity = 0;
     }
 
-    /// <summary>
+    /// <summary> 
     /// Remove <paramref name="row"/> from the table. An non-existent row is ignored.
     /// </summary>
-    public void RemoveRow(ObservableCollection<T?> row)
+    public void RemoveRow(IList<T?> row)
     {
-        int index = Records.IndexOf(row);
-        Records.Remove(row);
+        bool SequenceEqual(IEnumerable<T?> x) => Enumerable.SequenceEqual(x, row);
 
-        RecordTransaction(
-            () => InsertRow(index, row),
-            () => RemoveRow(Records[index])
-        );
+        int index = row is ObservableCollection<T?> collection
+            ? Records.IndexOf(collection)
+            : Array.FindIndex(Records.ToArray(), SequenceEqual);
+
+        RemoveRow(index);
     }
 
     /// <summary>
@@ -304,6 +304,20 @@ public class ObservableTable<T>
             yield return record[index];
             record.RemoveAt(index);
         }
+    }
+
+    /// <summary>
+    /// Removes a row at <paramref name="index"/>.
+    /// </summary>
+    private void RemoveRow(int index)
+    {
+        var row = Records[index];
+        Records.RemoveAt(index);
+
+        RecordTransaction(
+            () => InsertRow(index, row),
+            () => RemoveRow(index)
+        );
     }
 
     /// <summary>

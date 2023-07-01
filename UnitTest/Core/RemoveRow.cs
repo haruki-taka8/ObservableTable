@@ -34,18 +34,19 @@ public class RemoveRow
     }
 
     [TestMethod]
-    public void RemoveRow_NonexistentRow_Nothing()
+    public void RemoveRow_NonexistentRow_Exception()
     {
         var expected = Helper.GetSampleTable();
 
         var actual = Helper.GetSampleTable();
-        actual.RemoveRow(new ObservableCollection<string?>());
 
-        Assert.IsTrue(expected.ContentEquals(actual));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(
+            () => actual.RemoveRow(new ObservableCollection<string?>())
+        );
     }
 
     [TestMethod]
-    public void RemoveRow_NonAndExistentRow_RowRemoved()
+    public void RemoveRow_NonAndExistentRow_Exception()
     {
         ObservableTable<string> expected = new(
             new string[] { "A0", "B0", "C0" },
@@ -53,9 +54,10 @@ public class RemoveRow
         );
 
         var actual = Helper.GetSampleTable();
-        actual.RemoveRow(actual.Records[0], new ObservableCollection<string?>());
 
-        Assert.IsTrue(expected.ContentEquals(actual));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(
+            () => actual.RemoveRow(actual.Records[0], new ObservableCollection<string?>())
+        );
     }
 
     [TestMethod]
