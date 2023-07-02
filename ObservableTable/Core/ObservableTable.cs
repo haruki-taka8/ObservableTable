@@ -20,8 +20,8 @@ public class ObservableTable<T>
     #region Fields
 
     private readonly ObservableCollection<T> headers = new();
-    private Stack<Edit> undo = new();
-    private Stack<Edit> redo = new();
+    private readonly Stack<Edit> undo = new();
+    private readonly Stack<Edit> redo = new();
     private bool recordTransactions;
     private int parity;
 
@@ -278,7 +278,7 @@ public class ObservableTable<T>
     /// </summary>
     public void Undo()
     {
-        ProcessHistory(ref undo, ref redo, true);
+        ProcessHistory(undo, redo, true);
     }
 
     /// <summary>
@@ -286,7 +286,7 @@ public class ObservableTable<T>
     /// </summary>
     public void Redo()
     {
-        ProcessHistory(ref redo, ref undo, false);
+        ProcessHistory(redo, undo, false);
     }
 
     #endregion Public Methods
@@ -372,7 +372,7 @@ public class ObservableTable<T>
     /// </summary>
     /// <param name="stack">An undo or redo stack.</param>
     /// <param name="opposite">The stack opposite to <paramref name="stack"/> (i.e. redo if <paramref name="stack"/> is undo, and vice versa)</param>
-    private void ProcessHistory(ref Stack<Edit> stack, ref Stack<Edit> opposite, bool isUndo)
+    private void ProcessHistory(Stack<Edit> stack, Stack<Edit> opposite, bool isUndo)
     {
         int offset = isUndo ? 1 : -1;
 
