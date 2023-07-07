@@ -1,5 +1,4 @@
 ﻿using ObservableTable.Core;
-using System.Data;
 
 namespace UnitTest.Core;
 
@@ -8,20 +7,20 @@ public class EventHandler
 {
     private readonly static ObservableTable<string> original = Helper.GetSampleTable();
 
-    private void SingleHandler(object? sender, ModificationEventArgs e)
+    private void SingleHandler(object? sender, EditEventArgs e)
     {
         var table = (ObservableTable<string>)sender!;
         table.TableModified -= SingleHandler;
 
         Assert.AreEqual(e.Parity, 0);
 
-        e.OppositeAction.Invoke();
+        e.Undo();
         Assert.IsTrue(original.ContentEquals(table));
 
-        e.Action.Invoke();
+        e.Redo();
         Assert.IsFalse(original.ContentEquals(table));
 
-        e.OppositeAction.Invoke();
+        e.Undo();
         Assert.IsTrue(original.ContentEquals(table));
     }
 
@@ -110,20 +109,20 @@ public class EventHandler
     [TestMethod]
     public void EventHandler_Undo_Notified()
     {
-        static void Undo_SingleHandler(object? sender, ModificationEventArgs e)
+        static void Undo_SingleHandler(object? sender, EditEventArgs e)
         {
             var table = (ObservableTable<string>)sender!;
             table.TableModified -= Undo_SingleHandler;
 
             Assert.AreEqual(e.Parity, 0);
 
-            e.OppositeAction.Invoke();
+            e.Invoke(true);
             Assert.IsFalse(original.ContentEquals(table));
 
-            e.Action.Invoke();
+            e.Invoke(false);
             Assert.IsTrue(original.ContentEquals(table));
 
-            e.OppositeAction.Invoke();
+            e.Invoke(true);
             Assert.IsFalse(original.ContentEquals(table));
         }
 
@@ -154,7 +153,7 @@ public class EventHandler
         var actual = Helper.GetSampleTable();
         List<int> parity = new();
 
-        actual.TableModified += (object? sender, ModificationEventArgs e) => parity.Add(e.Parity);
+        actual.TableModified += (object? sender, EditEventArgs e) => parity.Add(e.Parity);
         List<List<string?>> rows = new() { new(), new() };
         actual.InsertRow(0, rows);
 
