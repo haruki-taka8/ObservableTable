@@ -13,15 +13,15 @@ public class ObservableTable<T>
     public ReadOnlyObservableCollection<T> Headers => new(headers);
     public int UndoCount => undo.Count;
     public int RedoCount => redo.Count;
-    public event EventHandler<ModificationEventArgs>? TableModified;
+    public event EventHandler<EditEventArgs>? TableModified;
 
     #endregion Properties
 
     #region Fields
 
     private readonly ObservableCollection<T> headers = new();
-    private readonly Stack<Edit> undo = new();
-    private readonly Stack<Edit> redo = new();
+    private readonly Stack<EditEventArgs> undo = new();
+    private readonly Stack<EditEventArgs> redo = new();
     private bool recordTransactions;
     private int parity;
 
@@ -349,8 +349,8 @@ public class ObservableTable<T>
     /// <param name="redoAction">Action that caused this transaction</param>
     private void RecordTransaction(Action undoAction, Action redoAction)
     {
-        Edit edit = new(undoAction, redoAction, parity);
-        TableModified?.Invoke(this, new(edit));
+        EditEventArgs edit = new(undoAction, redoAction, parity);
+        TableModified?.Invoke(this, edit);
 
         if (!recordTransactions) { return; }
         undo.Push(edit);
@@ -360,7 +360,7 @@ public class ObservableTable<T>
     /// <summary>
     /// Undo/redo a transaction without modifying the history stacks.
     /// </summary>
-    private void RevertHistory(Edit edit, bool isUndo)
+    private void RevertHistory(EditEventArgs edit, bool isUndo)
     {
         recordTransactions = false;
         edit.Invoke(isUndo);
@@ -372,17 +372,17 @@ public class ObservableTable<T>
     /// </summary>
     /// <param name="stack">An undo or redo stack.</param>
     /// <param name="opposite">The stack opposite to <paramref name="stack"/> (i.e. redo if <paramref name="stack"/> is undo, and vice versa)</param>
-    private void ProcessHistory(Stack<Edit> stack, Stack<Edit> opposite, bool isUndo)
+    private void ProcessHistory(Stack<EditEventArgs> stack, Stack<EditEventArgs> opposite, bool isUndo)
     {
         int offset = isUndo ? 1 : -1;
 
-        while (stack.TryPop(out Edit last))
+        while (stack.TryPop(out EditEventArgs? last))
         {
             opposite.Push(last);
             RevertHistory(last, isUndo);
 
-            stack.TryPeek(out Edit next);
-            if (last.Parity != next.Parity + offset) { return; }
+            stack.TryPeek(out EditEventArgs? next);
+            if (last.Parity != next?.Parity + offset) { return; }
         }
     }
 
