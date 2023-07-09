@@ -1,10 +1,13 @@
-﻿namespace ObservableTable.Core;
+﻿using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
+
+namespace ObservableTable.Core;
 
 /// <summary>
 /// Describe a column of type <typeparamref name="T"/>.
 /// </summary>
 public readonly struct Column<T>
-{
+{ 
     public T Header { get; init; }
     public IList<T?> Values { get; init; }
 
@@ -24,6 +27,17 @@ public readonly struct Column<T>
     {
         Header = header;
         Values = values;
+    }
+
+    public bool Equals(Column<T> column)
+    {
+        return Equals(column.Header, column.Values);
+    }
+
+    public bool Equals(T header, IEnumerable<T?> values)
+    {
+        return Header!.Equals(header)
+            && Enumerable.SequenceEqual(Values, values);
     }
 }
 
