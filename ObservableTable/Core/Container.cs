@@ -1,7 +1,4 @@
-﻿using System.Data.Common;
-using System.Diagnostics.CodeAnalysis;
-
-namespace ObservableTable.Core;
+﻿namespace ObservableTable.Core;
 
 /// <summary>
 /// Describe a column of type <typeparamref name="T"/>.
@@ -36,7 +33,8 @@ public readonly struct Column<T>
 
     public bool Equals(T header, IEnumerable<T?> values)
     {
-        return Header!.Equals(header)
+        return Header is not null
+            && Header.Equals(header)
             && Enumerable.SequenceEqual(Values, values);
     }
 }
