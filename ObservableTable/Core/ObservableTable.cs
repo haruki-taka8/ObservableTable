@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Reflection.Metadata.Ecma335;
 
 namespace ObservableTable.Core;
 
@@ -108,12 +109,7 @@ public class ObservableTable<T>
     /// </summary>
     public void RemoveRow(IList<T?> row)
     {
-        bool SequenceEqual(IEnumerable<T?> x) => Enumerable.SequenceEqual(x, row);
-
-        int index = row is ObservableCollection<T?> collection
-            ? Records.IndexOf(collection)
-            : Array.FindIndex(Records.ToArray(), SequenceEqual);
-
+        int index = RowIndexOf(row);
         RemoveRow(index);
     }
 
@@ -271,6 +267,62 @@ public class ObservableTable<T>
         cells = cells.Replace(from, to);
 
         SetCell(cells);
+    }
+
+    /// <summary>
+    /// Find the first occurrence of <paramref name="row"/> in the table.
+    /// </summary>
+    /// <returns>The zero-based index of <paramref name="row"/> in the table. If not found, -1.</returns>
+    public int RowIndexOf(IList<T?> row)
+    {
+        if (row is ObservableCollection<T?> collection)
+        {
+            return Records.IndexOf(collection);
+        }
+
+        for (int i = 0; i < Records.Count; i++)
+        {
+            if (Enumerable.SequenceEqual(Records[i], row))
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Find the first occurrence of <paramref name="column"/> in the table.
+    /// </summary>
+    /// <returns>The zero-based index of <paramref name="column"/> in the table. If not found, -1.</returns>
+    public int ColumnIndexOf(Column<T> column)
+    {
+        for (int i = 0; i < headers.Count; i++)
+        {
+            var extractedColumn = Records.Select(x => x[i]);
+
+            if (column.Equals(headers[i], extractedColumn))
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Find the first occurrence of <paramref name="value"/>, from left-to-right, then top-to-bottom. 
+    /// </summary>
+    /// <returns>The row and column of the cell. If not found, (-1, -1).</returns>
+    public (int, int) CellIndexOf(T value)
+    {
+        var cells = FindCell(value);
+
+        if (cells.Any())
+        {
+            Cell<T> cell = cells.First();
+            return (cell.Row, cell.Column);
+        }
+
+        return (-1, -1);
     }
 
     /// <summary>
