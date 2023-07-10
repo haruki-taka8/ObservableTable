@@ -32,31 +32,4 @@ internal static class Helper
             }
         }
     }
-
-    /// <summary>
-    /// Replace all occurrences of <paramref name="from"/> with <paramref name="to"/> in <paramref name="cells"/>.
-    /// </summary>
-    /// <returns>
-    /// The modified enumerable of <seealso cref="Cell{T}"/>.
-    /// </returns>
-    internal static IEnumerable<Cell<T>> Replace<T>(this IEnumerable<Cell<T>> cells, T from, T to)
-    {
-        foreach (var cell in cells)
-        {
-            yield return Replace(cell, from, to);
-        }
-    }
-
-    /// <summary>
-    /// Replace <paramref name="from"/> with <paramref name="to"/>.
-    /// </summary>
-    /// <returns>
-    /// The modified <seealso cref="Cell{T}"/>.
-    /// </returns>
-    private static Cell<T> Replace<T>(this Cell<T> cell, T from, T to)
-    {
-        return Equals(from, cell.Value)
-            ? new(cell.Row, cell.Column, to)
-            : cell;
-    }
 }
