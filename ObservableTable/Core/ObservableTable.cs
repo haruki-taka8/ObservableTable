@@ -262,11 +262,10 @@ public class ObservableTable<T>
     /// <param name="cells">Range of cell to perform the lookup. Skip to indicate whole table.</param>
     public void ReplaceCell(T from, T to, IEnumerable<Cell<T>>? cells = null)
     {
-        cells ??= this.ToCells();
-
-        cells = cells.Replace(from, to);
-
-        SetCell(cells);
+        cells = FindCell(from, cells);
+        
+        var newCells = cells.Select(x => new Cell<T>(x.Row, x.Column, to));
+        SetCell(newCells);
     }
 
     /// <summary>
