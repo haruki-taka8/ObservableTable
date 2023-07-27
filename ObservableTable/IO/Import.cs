@@ -16,16 +16,20 @@ public static class Importer
     /// <summary>
     /// Read from a file and convert its content into a jagged array.
     /// </summary>
-    private static IEnumerable<IList<string?>> GetRecords(string path)
+    private async static Task<IEnumerable<IList<string?>>> GetRecords(string path)
     {
         using StreamReader streamReader = new(path);
         using CsvReader csvReader = new(streamReader, configuration);
-        
-        while (csvReader.Read())
+
+        List<IList<string?>> records = new();
+
+        while (await csvReader.ReadAsync())
         {
             var row = csvReader.Parser.Record ?? Array.Empty<string>();
-            yield return row;
+            records.Add(row);
         }
+
+        return records;
     }
 
     /// <summary>
@@ -47,13 +51,25 @@ public static class Importer
     }
 
     /// <summary>
-    /// Public method allowing consumers to convert a CSV file to an ObservableTable{string}.
+    /// Public method allowing consumers to convert a CSV file to an ObservableTable{string}. Use <see cref="FromFilePathAsync(string, bool)"/>
+    /// when reading a large file.
     /// </summary>
     /// <param name="hasHeader">Whether the file has headers or not. If not, numbered headers are generated.</param>
     /// <returns></returns>
     public static ObservableTable<string> FromFilePath(string path, bool hasHeader = true)
     {
-        var records = GetRecords(path).ToList();
+        return Task.Run(() => FromFilePathAsync(path, hasHeader)).Result;
+    }
+
+
+    /// <summary>
+    /// Public method allowing consumers to convert a CSV file to an ObservableTable{string} asynchrnously.
+    /// </summary>
+    /// <param name="hasHeader">Whether the file has headers or not. If not, numbered headers are generated.</param>
+    /// <returns></returns>
+    public async static Task<ObservableTable<string>> FromFilePathAsync(string path, bool hasHeader = true)
+    {
+        var records = (await GetRecords(path)).ToList();
 
         var firstRow = records.FirstOrDefault() ?? new List<string?>();
 

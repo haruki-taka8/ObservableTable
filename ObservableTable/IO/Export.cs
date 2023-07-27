@@ -41,7 +41,8 @@ public static class Exporter
     }
 
     /// <summary>
-    /// Converts an ObservableTable{string} to a multi-line CSV file.
+    /// Converts an ObservableTable{string} to a multi-line CSV file. Use <see cref="ToFileAsync(ObservableTable{string}, string, bool)"/> if
+    /// writing the file will take a long time.
     /// </summary>
     /// <param name="hasHeader">If true, the headers of the table will be written to the file.</param>
     public static void ToFile(this ObservableTable<string> table, string path, bool hasHeader = true)
@@ -50,6 +51,15 @@ public static class Exporter
         File.WriteAllText(path, content);
     }
 
+    /// <summary>
+    /// Converts an ObservableTable{string} to a multi-line CSV file asynchronously.
+    /// </summary>
+    /// <param name="hasHeader">If true, the headers of the table will be written to the file.</param>
+    public static async Task ToFileAsync(this ObservableTable<string> table, string path, bool hasHeader = true)
+    {
+        var content = ToCsvString(table, hasHeader);
+        await File.WriteAllTextAsync(path, content);
+    }
 
     /// <summary>
     /// Converts an ObservableTable{string} to a multi-line CSV file.
