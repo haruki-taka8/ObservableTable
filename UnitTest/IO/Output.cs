@@ -258,4 +258,64 @@ public class Output
 
         Assert.IsTrue(table.ContentEquals(newTable));
     }
+
+    [TestMethod]
+    public async Task ToFileAsync_HasHeader()
+    {
+        var table = Importer.FromFilePath(CsvFolder + "Quoted.csv", true);
+        await table.ToFileAsync("temp.csv", true);
+        var newTable = Importer.FromFilePath("temp.csv", true);
+    
+        Assert.IsTrue(table.ContentEquals(newTable));
+    }
+    
+    [TestMethod]
+    public async Task ToFile_HasNoHeaderAsync()
+    {
+        var table = Importer.FromFilePath(CsvFolder + "Quoted.csv", false);
+        await table.ToFileAsync("temp.csv", false);
+        var newTable = Importer.FromFilePath("temp.csv", false);
+    
+        Assert.IsTrue(table.ContentEquals(newTable));
+    }
+    
+    [TestMethod]
+    public async Task ToFileAsync_Single_HasHeader()
+    {
+        var table = Importer.FromFilePath(CsvFolder + "Single.csv", true);
+        await table.ToFileAsync("temp.csv", true);
+        var newTable = Importer.FromFilePath("temp.csv", true);
+    
+        Assert.IsTrue(table.ContentEquals(newTable));
+    }
+    
+    [TestMethod]
+    public async Task ToFileAsync_Single_HasNoHeader()
+    {
+        var table = Importer.FromFilePath(CsvFolder + "Single.csv", false);
+        await table.ToFileAsync("temp.csv", false);
+        var newTable = Importer.FromFilePath("temp.csv", false);
+    
+        Assert.IsTrue(table.ContentEquals(newTable));
+    }
+    
+    [TestMethod]
+    public async Task ToFileAsync_Empty_HasHeader()
+    {
+        var table = Importer.FromFilePath(CsvFolder + "Empty.csv", true);
+        await table.ToFileAsync("temp.csv", true);
+        var newTable = Importer.FromFilePath("temp.csv", true);
+    
+        Assert.IsTrue(table.ContentEquals(newTable));
+    }
+    
+    [TestMethod]
+    public async Task ToFileAsync_Empty_HasNoHeader()
+    {
+        var table = Importer.FromFilePath(CsvFolder + "Empty.csv", false);
+        await table.ToFileAsync("temp.csv", false);
+        var newTable = Importer.FromFilePath("temp.csv", false);
+    
+        Assert.IsTrue(table.ContentEquals(newTable));
+    }
 }
