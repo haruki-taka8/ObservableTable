@@ -3,7 +3,7 @@ using System.Collections.Specialized;
 
 namespace ObservableTable.Core;
 
-public class ObservableTable<T>
+public class ObservableTable<T> where T : notnull
 {
     #region Properties
 

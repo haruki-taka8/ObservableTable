@@ -22,7 +22,7 @@ internal static class Helper
     /// <remarks>
     /// The table is flattened left-to-right, top-to-bottom. 
     /// </remarks>
-    internal static IEnumerable<Cell<T>> ToCells<T>(this ObservableTable<T> table)
+    internal static IEnumerable<Cell<T>> ToCells<T>(this ObservableTable<T> table) where T : notnull
     {
         for (int row = 0; row < table.Records.Count; row++)
         {
