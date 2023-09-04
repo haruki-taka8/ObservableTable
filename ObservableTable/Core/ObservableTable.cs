@@ -297,9 +297,10 @@ public class ObservableTable<T> where T : notnull
     {
         for (int i = 0; i < headers.Count; i++)
         {
-            var extractedColumn = Records.Select(x => x[i]);
+            var extractedColumn = Records.Select(x => x[i]).ToList();
+            Column<T> thisColumn = new(headers[i], extractedColumn);
 
-            if (column.Equals(headers[i], extractedColumn))
+            if (column == thisColumn)
             {
                 return i;
             }
