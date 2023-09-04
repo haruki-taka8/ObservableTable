@@ -30,13 +30,21 @@ public readonly struct Column<T> : IEquatable<Column<T>> where T : notnull
     // IEquatable implementation
     public override int GetHashCode()
     {
-        return HashCode.Combine(Header, Values.ToArray());
+        HashCode hashCode = new();
+        hashCode.Add(Header);
+
+        foreach (var item in Values)
+        {
+            hashCode.Add(item);
+        }
+
+        return hashCode.ToHashCode();
     }
     
     public bool Equals(Column<T> other)
     {
         return GetHashCode() == other.GetHashCode();
-    }
+    } 
     
     public override bool Equals(object? obj)
     {
