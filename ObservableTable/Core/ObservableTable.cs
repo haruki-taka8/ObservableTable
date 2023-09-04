@@ -4,7 +4,7 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace ObservableTable.Core;
 
-public class ObservableTable<T>
+public class ObservableTable<T> where T : notnull
 {
     #region Properties
 
@@ -297,9 +297,10 @@ public class ObservableTable<T>
     {
         for (int i = 0; i < headers.Count; i++)
         {
-            var extractedColumn = Records.Select(x => x[i]);
+            var extractedColumn = Records.Select(x => x[i]).ToList();
+            Column<T> thisColumn = new(headers[i], extractedColumn);
 
-            if (column.Equals(headers[i], extractedColumn))
+            if (column == thisColumn)
             {
                 return i;
             }
