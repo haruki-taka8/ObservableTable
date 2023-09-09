@@ -5,7 +5,7 @@ using ObservableTable.Core;
 
 namespace ObservableTable.IO;
 
-public static class Importer
+public static class ObservableTableImporter
 {    
     private static readonly CsvConfiguration configuration = new(CultureInfo.InvariantCulture)
     {

@@ -31,7 +31,7 @@ public class Input
     [TestMethod]
     public void FromFilePath_Quoted_HasHeaders()
     {
-        ObservableTable<string> table = Importer.FromFilePath(CsvFolder + "Quoted.csv");
+        ObservableTable<string> table = ObservableTableImporter.FromFilePath(CsvFolder + "Quoted.csv");
 
         TestHeader(table.Headers, FirstRowInCsvFile);
         TestRecords(table.Records, 1, 5);
@@ -40,7 +40,7 @@ public class Input
     [TestMethod]
     public void FromFilePath_Quoted_HasNoHeaders()
     {
-        ObservableTable<string> table = Importer.FromFilePath(CsvFolder + "Quoted.csv", false);
+        ObservableTable<string> table = ObservableTableImporter.FromFilePath(CsvFolder + "Quoted.csv", false);
 
         TestHeader(table.Headers, RowSuffixes);
         TestRecords(table.Records, 0, 6);
@@ -49,7 +49,7 @@ public class Input
     [TestMethod]
     public void FromFilePath_Unquoted_HasHeaders()
     {
-        ObservableTable<string> table = Importer.FromFilePath(CsvFolder + "Unquoted.csv");
+        ObservableTable<string> table = ObservableTableImporter.FromFilePath(CsvFolder + "Unquoted.csv");
 
         TestHeader(table.Headers, FirstRowInCsvFile);
         TestRecords(table.Records, 1, 5);
@@ -58,7 +58,7 @@ public class Input
     [TestMethod]
     public void FromFilePath_Unquoted_HasNoHeaders()
     {
-        ObservableTable<string> table = Importer.FromFilePath(CsvFolder + "Unquoted.csv", false);
+        ObservableTable<string> table = ObservableTableImporter.FromFilePath(CsvFolder + "Unquoted.csv", false);
 
         TestHeader(table.Headers, RowSuffixes);
         TestRecords(table.Records, 0, 6);
@@ -67,7 +67,7 @@ public class Input
     [TestMethod]
     public void FromFilePath_Single_HasHeaders()
     {
-        ObservableTable<string> table = Importer.FromFilePath(CsvFolder + "Single.csv", true);
+        ObservableTable<string> table = ObservableTableImporter.FromFilePath(CsvFolder + "Single.csv", true);
 
         TestHeader(table.Headers, FirstRowInCsvFile);
         TestRecords(table.Records, 0, 0);
@@ -76,7 +76,7 @@ public class Input
     [TestMethod]
     public void FromFilePath_Single_HasNoHeaders()
     {
-        ObservableTable<string> table = Importer.FromFilePath(CsvFolder + "Single.csv", false);
+        ObservableTable<string> table = ObservableTableImporter.FromFilePath(CsvFolder + "Single.csv", false);
 
         TestHeader(table.Headers, RowSuffixes);
         TestRecords(table.Records, 0, 1);
@@ -85,7 +85,7 @@ public class Input
     [TestMethod]
     public void FromFilePath_Empty_HasHeaders()
     {
-        ObservableTable<string> table = Importer.FromFilePath(CsvFolder + "Empty.csv", true);
+        ObservableTable<string> table = ObservableTableImporter.FromFilePath(CsvFolder + "Empty.csv", true);
 
         Assert.AreEqual(0, table.Headers.Count);
         Assert.AreEqual(0, table.Records.Count);
@@ -94,7 +94,7 @@ public class Input
     [TestMethod]
     public void FromFilePath_Empty_HasNoHeaders()
     {
-        ObservableTable<string> table = Importer.FromFilePath(CsvFolder + "Empty.csv", false);
+        ObservableTable<string> table = ObservableTableImporter.FromFilePath(CsvFolder + "Empty.csv", false);
 
         Assert.AreEqual(0, table.Headers.Count);
         Assert.AreEqual(0, table.Records.Count);
@@ -103,7 +103,7 @@ public class Input
     [TestMethod]
     public async Task FromFilePathAsync_Quoted_HasHeaders()
     {
-        ObservableTable<string> table = await Importer.FromFilePathAsync(CsvFolder + "Quoted.csv");
+        ObservableTable<string> table = await ObservableTableImporter.FromFilePathAsync(CsvFolder + "Quoted.csv");
 
         TestHeader(table.Headers, FirstRowInCsvFile);
         TestRecords(table.Records, 1, 5);
@@ -112,7 +112,7 @@ public class Input
     [TestMethod]
     public async Task FromFilePathAsync_Quoted_HasNoHeaders()
     {
-        ObservableTable<string> table = await Importer.FromFilePathAsync(CsvFolder + "Quoted.csv", false);
+        ObservableTable<string> table = await ObservableTableImporter.FromFilePathAsync(CsvFolder + "Quoted.csv", false);
 
         TestHeader(table.Headers, RowSuffixes);
         TestRecords(table.Records, 0, 6);
@@ -121,7 +121,7 @@ public class Input
     [TestMethod]
     public async Task FromFilePathAsync_Unquoted_HasHeaders()
     {
-        ObservableTable<string> table = await Importer.FromFilePathAsync(CsvFolder + "Unquoted.csv");
+        ObservableTable<string> table = await ObservableTableImporter.FromFilePathAsync(CsvFolder + "Unquoted.csv");
 
         TestHeader(table.Headers, FirstRowInCsvFile);
         TestRecords(table.Records, 1, 5);
@@ -130,7 +130,7 @@ public class Input
     [TestMethod]
     public async Task FromFilePathAsync_Unquoted_HasNoHeaders()
     {
-        ObservableTable<string> table = await Importer.FromFilePathAsync(CsvFolder + "Unquoted.csv", false);
+        ObservableTable<string> table = await ObservableTableImporter.FromFilePathAsync(CsvFolder + "Unquoted.csv", false);
 
         TestHeader(table.Headers, RowSuffixes);
         TestRecords(table.Records, 0, 6);
@@ -139,7 +139,7 @@ public class Input
     [TestMethod]
     public async Task FromFilePathAsync_Single_HasHeaders()
     {
-        ObservableTable<string> table = await Importer.FromFilePathAsync(CsvFolder + "Single.csv", true);
+        ObservableTable<string> table = await ObservableTableImporter.FromFilePathAsync(CsvFolder + "Single.csv", true);
 
         TestHeader(table.Headers, FirstRowInCsvFile);
         TestRecords(table.Records, 0, 0);
@@ -148,7 +148,7 @@ public class Input
     [TestMethod]
     public async Task FromFilePathAsync_Single_HasNoHeaders()
     {
-        ObservableTable<string> table = await Importer.FromFilePathAsync(CsvFolder + "Single.csv", false);
+        ObservableTable<string> table = await ObservableTableImporter.FromFilePathAsync(CsvFolder + "Single.csv", false);
 
         TestHeader(table.Headers, RowSuffixes);
         TestRecords(table.Records, 0, 1);
@@ -157,7 +157,7 @@ public class Input
     [TestMethod]
     public async Task FromFilePathAsync_Empty_HasHeaders()
     {
-        ObservableTable<string> table = await Importer.FromFilePathAsync(CsvFolder + "Empty.csv", true);
+        ObservableTable<string> table = await ObservableTableImporter.FromFilePathAsync(CsvFolder + "Empty.csv", true);
 
         Assert.AreEqual(0, table.Headers.Count);
         Assert.AreEqual(0, table.Records.Count);
@@ -166,7 +166,7 @@ public class Input
     [TestMethod]
     public async Task FromFilePathAsync_Empty_HasNoHeaders()
     {
-        ObservableTable<string> table = await Importer.FromFilePathAsync(CsvFolder + "Empty.csv", false);
+        ObservableTable<string> table = await ObservableTableImporter.FromFilePathAsync(CsvFolder + "Empty.csv", false);
 
         Assert.AreEqual(0, table.Headers.Count);
         Assert.AreEqual(0, table.Records.Count);

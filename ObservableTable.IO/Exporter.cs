@@ -2,7 +2,7 @@
 
 namespace ObservableTable.IO;
 
-public static class Exporter
+public static class ObservableTableExporter
 {
     /// <summary>
     /// Converts an enumerable to a CSV row, fully quoted.

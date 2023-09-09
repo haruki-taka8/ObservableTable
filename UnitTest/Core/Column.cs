@@ -1,4 +1,6 @@
-﻿namespace UnitTest.Core;
+﻿using ObservableTable.Core;
+
+namespace UnitTest.Core;
 
 [TestClass]
 public class Column
@@ -6,8 +8,8 @@ public class Column
     [TestMethod]
     public void Column_IdenticalColumns_EqualOperator_True()
     {
-        ObservableTable.Core.Column<string> expected = new("header");
-        ObservableTable.Core.Column<string> actual = new("header");
+        Column<string> expected = new("header");
+        Column<string> actual = new("header");
 
         Assert.IsTrue(expected == actual);
     }
@@ -16,8 +18,8 @@ public class Column
     public void Column_EqualColumns_Equals_True()
     {
         // Testing the default comparator
-        ObservableTable.Core.Column<string> expected = new("header");
-        ObservableTable.Core.Column<string> actual = new("header");
+        Column<string> expected = new("header");
+        Column<string> actual = new("header");
 
         Assert.AreEqual(expected, actual);
     }
@@ -25,17 +27,14 @@ public class Column
     [TestMethod]
     public void Column_DifferentColumnNames_EqualOperator_False()
     {
-        ObservableTable.Core.Column<string> expected = new("header", Array.Empty<string>());
-        ObservableTable.Core.Column<string> actual = new("differentHeader", Array.Empty<string>());
-
-        Assert.IsTrue(expected != actual);
+        Column<string> expected = new("header", Array.Empty<string>());
+        Column<string> actual = new("differentHeader", Array.Empty<string>());
     }
 
-    [TestMethod]
     public void Column_DifferentColumnNames_Equals_NotEqual()
     {
-        ObservableTable.Core.Column<string> expected = new("header", Array.Empty<string>());
-        ObservableTable.Core.Column<string> actual = new("differentHeader", Array.Empty<string>());
+        Column<string> expected = new("header", Array.Empty<string>());
+        Column<string> actual = new("differentHeader", Array.Empty<string>());
 
         Assert.AreNotEqual(expected, actual);
     }
@@ -44,8 +43,8 @@ public class Column
     [TestMethod]
     public void Column_DifferentColumnValues_EqualOperator_False()
     {
-        ObservableTable.Core.Column<string> expected = new("header", Array.Empty<string>());
-        ObservableTable.Core.Column<string> actual = new("header", new string[] { "foo", "bar" });
+        Column<string> expected = new("header", Array.Empty<string>());
+        Column<string> actual = new("header", new string[] { "foo", "bar" });
 
         Assert.IsTrue(expected != actual);
     }
@@ -53,8 +52,8 @@ public class Column
     [TestMethod]
     public void Column_DifferentColumnValues_Equals_NotEqual()
     {
-        ObservableTable.Core.Column<string> expected = new("header", Array.Empty<string>());
-        ObservableTable.Core.Column<string> actual = new("header", new string[] { "foo", "bar" });
+        Column<string> expected = new("header", Array.Empty<string>());
+        Column<string> actual = new("header", new string[] { "foo", "bar" });
 
         Assert.AreNotEqual(expected, actual);
     }

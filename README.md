@@ -25,10 +25,16 @@ ObservableTable<string> table = new(headers, records);
 
 To import data from a CSV file:
 ```c#
-ObservableTable<string> table = Importer.FromFilePath("path.csv");
+ObservableTable<string> table = ObservableTableImporter.FromFilePath("path.csv");
+```
+
+To export data to a CSV file:
+```c#
+table.ToFile("path.csv");
 ```
 
 ## Requirements
+For `ObservableTable.IO` only, not required for `ObservableTable<T>` itself.
 * [CsvHelper](https://github.com/JoshClose/CsvHelper)
 
 ## Contributing

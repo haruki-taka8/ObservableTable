@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ObservableTable.Core;
+﻿namespace ObservableTable.Core;
 
 /// <summary>
 /// Describe a cell of type <typeparamref name="T"/>.

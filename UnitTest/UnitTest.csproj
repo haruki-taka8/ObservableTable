@@ -6,6 +6,10 @@
     <Nullable>enable</Nullable>
 
     <IsPackable>false</IsPackable>
+
+    <Version>23.12.0</Version>
+
+    <Authors>haruki-taka8</Authors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ObservableTable.IO\ObservableTable.IO.csproj" />
     <ProjectReference Include="..\ObservableTable\ObservableTable.csproj" />
   </ItemGroup>
 
