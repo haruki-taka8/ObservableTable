@@ -4,7 +4,7 @@ namespace UnitTest;
 
 internal static class Helper
 {
-    internal static bool ContentEquals<T>(this ObservableTable<T> a, ObservableTable<T> b)
+    internal static bool ContentEquals<T>(this ObservableTable<T> a, ObservableTable<T> b) where T : notnull
     {
         // Headers
         if (!Enumerable.SequenceEqual(a.Headers, b.Headers))
