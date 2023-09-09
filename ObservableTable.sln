@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObservableTable.IO", "ObservableTable.IO\ObservableTable.IO.csproj", "{B5B21545-8D92-436B-AE38-F7B19165D437}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{30C565E3-7134-45AC-A68D-BEC467DB06A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30C565E3-7134-45AC-A68D-BEC467DB06A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30C565E3-7134-45AC-A68D-BEC467DB06A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5B21545-8D92-436B-AE38-F7B19165D437}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5B21545-8D92-436B-AE38-F7B19165D437}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5B21545-8D92-436B-AE38-F7B19165D437}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5B21545-8D92-436B-AE38-F7B19165D437}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

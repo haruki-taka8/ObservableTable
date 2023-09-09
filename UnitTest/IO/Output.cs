@@ -28,9 +28,9 @@ public class Output
     [TestMethod]
     public void ToCsvString_Quoted_HasHeaders()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Quoted.csv", true);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Quoted.csv", true);
 
-        var actualTableString = Exporter.ToCsvString(table, true);
+        var actualTableString = ObservableTableExporter.ToCsvString(table, true);
 
         AssertTable(actualTableString);
     }
@@ -38,9 +38,9 @@ public class Output
     [TestMethod]
     public void ToCsvString_Quoted_HasNoHeaders()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Quoted.csv", false);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Quoted.csv", false);
 
-        var actualTableString = Exporter.ToCsvString(table, false);
+        var actualTableString = ObservableTableExporter.ToCsvString(table, false);
 
         AssertTable(actualTableString);
     }
@@ -48,9 +48,9 @@ public class Output
     [TestMethod]
     public void ToCsvString_Unquoted_HasHeaders()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Unquoted.csv", true);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Unquoted.csv", true);
 
-        var actualTableString = Exporter.ToCsvString(table, true);
+        var actualTableString = ObservableTableExporter.ToCsvString(table, true);
 
         AssertTable(actualTableString);
     }
@@ -58,9 +58,9 @@ public class Output
     [TestMethod]
     public void ToCsvString_Unquoted_HasNoHeaders()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Unquoted.csv", false);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Unquoted.csv", false);
 
-        var actualTableString = Exporter.ToCsvString(table, false);
+        var actualTableString = ObservableTableExporter.ToCsvString(table, false);
 
         AssertTable(actualTableString);
     }
@@ -68,9 +68,9 @@ public class Output
     [TestMethod]
     public void ToCsvString_Single_HasHeaders()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Single.csv", true);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Single.csv", true);
 
-        var actualTableString = Exporter.ToCsvString(table, true);
+        var actualTableString = ObservableTableExporter.ToCsvString(table, true);
 
         Assert.AreEqual(FirstRowInCsvFile, actualTableString, false);
     }
@@ -78,9 +78,9 @@ public class Output
     [TestMethod]
     public void ToCsvString_Single_HasNoHeaders()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Single.csv", false);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Single.csv", false);
 
-        var actualTableString = Exporter.ToCsvString(table, false);
+        var actualTableString = ObservableTableExporter.ToCsvString(table, false);
 
         Assert.AreEqual(FirstRowInCsvFile, actualTableString, false);
     }
@@ -88,9 +88,9 @@ public class Output
     [TestMethod]
     public void ToCsvString_Empty_HasHeaders()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Empty.csv", true);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Empty.csv", true);
 
-        var actualTableString = Exporter.ToCsvString(table, true);
+        var actualTableString = ObservableTableExporter.ToCsvString(table, true);
 
         Assert.IsTrue(
             string.IsNullOrEmpty(actualTableString),
@@ -101,9 +101,9 @@ public class Output
     [TestMethod]
     public void ToCsvString_Empty_HasNoHeaders()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Empty.csv", false);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Empty.csv", false);
 
-        var actualTableString = Exporter.ToCsvString(table, false);
+        var actualTableString = ObservableTableExporter.ToCsvString(table, false);
 
         Assert.IsTrue(
             string.IsNullOrEmpty(actualTableString),
@@ -114,9 +114,9 @@ public class Output
     [TestMethod]
     public void ToCsvStringEnumerable_Quoted_HasHeaders()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Quoted.csv", true);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Quoted.csv", true);
 
-        var actualTableString = Exporter.ToIEnumerable(table, true);
+        var actualTableString = ObservableTableExporter.ToIEnumerable(table, true);
 
         AssertTableEnumerable(actualTableString);
     }
@@ -124,9 +124,9 @@ public class Output
     [TestMethod]
     public void ToCsvStringEnumerable_Quoted_HasNoHeaders()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Quoted.csv", false);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Quoted.csv", false);
 
-        var actualTableString = Exporter.ToIEnumerable(table, false);
+        var actualTableString = ObservableTableExporter.ToIEnumerable(table, false);
 
         AssertTableEnumerable(actualTableString);
     }
@@ -134,9 +134,9 @@ public class Output
     [TestMethod]
     public void ToCsvStringEnumerable_Unquoted_HasHeaders()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Unquoted.csv", true);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Unquoted.csv", true);
 
-        var actualTableString = Exporter.ToCsvString(table, true);
+        var actualTableString = ObservableTableExporter.ToCsvString(table, true);
 
         AssertTable(actualTableString);
     }
@@ -144,9 +144,9 @@ public class Output
     [TestMethod]
     public void ToCsvStringEnumerable_Unquoted_HasNoHeaders()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Unquoted.csv", false);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Unquoted.csv", false);
 
-        var actualTableString = Exporter.ToIEnumerable(table, false);
+        var actualTableString = ObservableTableExporter.ToIEnumerable(table, false);
 
         AssertTableEnumerable(actualTableString);
     }
@@ -154,9 +154,9 @@ public class Output
     [TestMethod]
     public void ToCsvStringEnumerable_Single_HasHeaders()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Single.csv", true);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Single.csv", true);
 
-        var actualTableString = Exporter.ToIEnumerable(table, true);
+        var actualTableString = ObservableTableExporter.ToIEnumerable(table, true);
 
         Assert.IsTrue(actualTableString.Any());
         Assert.AreEqual(FirstRowInCsvFile, actualTableString.First(), false);
@@ -165,9 +165,9 @@ public class Output
     [TestMethod]
     public void ToCsvStringEnumerable_Single_HasNoHeaders()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Single.csv", false);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Single.csv", false);
 
-        var actualTableString = Exporter.ToIEnumerable(table, false);
+        var actualTableString = ObservableTableExporter.ToIEnumerable(table, false);
 
         Assert.IsTrue(actualTableString.Any());
         Assert.AreEqual(FirstRowInCsvFile, actualTableString.First(), false);
@@ -176,9 +176,9 @@ public class Output
     [TestMethod]
     public void ToCsvStringEnumerable_Empty_HasHeaders()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Empty.csv", true);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Empty.csv", true);
 
-        var actualTableString = Exporter.ToIEnumerable(table, true);
+        var actualTableString = ObservableTableExporter.ToIEnumerable(table, true);
 
         Assert.IsTrue(
             string.IsNullOrEmpty(string.Join(Environment.NewLine, actualTableString)),
@@ -189,9 +189,9 @@ public class Output
     [TestMethod]
     public void ToCsvStringEnumerable_Empty_HasNoHeaders()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Empty.csv", false);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Empty.csv", false);
 
-        var actualTableString = Exporter.ToIEnumerable(table, false);
+        var actualTableString = ObservableTableExporter.ToIEnumerable(table, false);
 
         Assert.IsTrue(
             string.IsNullOrEmpty(string.Join(Environment.NewLine, actualTableString)),
@@ -202,9 +202,9 @@ public class Output
     [TestMethod]
     public void ToFile_HasHeader()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Quoted.csv", true);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Quoted.csv", true);
         table.ToFile("temp.csv", true);
-        var newTable = Importer.FromFilePath("temp.csv", true);
+        var newTable = ObservableTableImporter.FromFilePath("temp.csv", true);
 
         Assert.IsTrue(table.ContentEquals(newTable));
     }
@@ -212,9 +212,9 @@ public class Output
     [TestMethod]
     public void ToFile_HasNoHeader()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Quoted.csv", false);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Quoted.csv", false);
         table.ToFile("temp.csv", false);
-        var newTable = Importer.FromFilePath("temp.csv", false);
+        var newTable = ObservableTableImporter.FromFilePath("temp.csv", false);
 
         Assert.IsTrue(table.ContentEquals(newTable));
     }
@@ -222,9 +222,9 @@ public class Output
     [TestMethod]
     public void ToFile_Single_HasHeader()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Single.csv", true);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Single.csv", true);
         table.ToFile("temp.csv", true);
-        var newTable = Importer.FromFilePath("temp.csv", true);
+        var newTable = ObservableTableImporter.FromFilePath("temp.csv", true);
 
         Assert.IsTrue(table.ContentEquals(newTable));
     }
@@ -232,9 +232,9 @@ public class Output
     [TestMethod]
     public void ToFile_Single_HasNoHeader()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Single.csv", false);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Single.csv", false);
         table.ToFile("temp.csv", false);
-        var newTable = Importer.FromFilePath("temp.csv", false);
+        var newTable = ObservableTableImporter.FromFilePath("temp.csv", false);
 
         Assert.IsTrue(table.ContentEquals(newTable));
     }
@@ -242,9 +242,9 @@ public class Output
     [TestMethod]
     public void ToFile_Empty_HasHeader()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Empty.csv", true);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Empty.csv", true);
         table.ToFile("temp.csv", true);
-        var newTable = Importer.FromFilePath("temp.csv", true);
+        var newTable = ObservableTableImporter.FromFilePath("temp.csv", true);
 
         Assert.IsTrue(table.ContentEquals(newTable));
     }
@@ -252,10 +252,70 @@ public class Output
     [TestMethod]
     public void ToFile_Empty_HasNoHeader()
     {
-        var table = Importer.FromFilePath(CsvFolder + "Empty.csv", false);
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Empty.csv", false);
         table.ToFile("temp.csv", false);
-        var newTable = Importer.FromFilePath("temp.csv", false);
+        var newTable = ObservableTableImporter.FromFilePath("temp.csv", false);
 
+        Assert.IsTrue(table.ContentEquals(newTable));
+    }
+
+    [TestMethod]
+    public async Task ToFileAsync_HasHeader()
+    {
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Quoted.csv", true);
+        await table.ToFileAsync("temp.csv", true);
+        var newTable = ObservableTableImporter.FromFilePath("temp.csv", true);
+    
+        Assert.IsTrue(table.ContentEquals(newTable));
+    }
+    
+    [TestMethod]
+    public async Task ToFile_HasNoHeaderAsync()
+    {
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Quoted.csv", false);
+        await table.ToFileAsync("temp.csv", false);
+        var newTable = ObservableTableImporter.FromFilePath("temp.csv", false);
+    
+        Assert.IsTrue(table.ContentEquals(newTable));
+    }
+    
+    [TestMethod]
+    public async Task ToFileAsync_Single_HasHeader()
+    {
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Single.csv", true);
+        await table.ToFileAsync("temp.csv", true);
+        var newTable = ObservableTableImporter.FromFilePath("temp.csv", true);
+    
+        Assert.IsTrue(table.ContentEquals(newTable));
+    }
+    
+    [TestMethod]
+    public async Task ToFileAsync_Single_HasNoHeader()
+    {
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Single.csv", false);
+        await table.ToFileAsync("temp.csv", false);
+        var newTable = ObservableTableImporter.FromFilePath("temp.csv", false);
+    
+        Assert.IsTrue(table.ContentEquals(newTable));
+    }
+    
+    [TestMethod]
+    public async Task ToFileAsync_Empty_HasHeader()
+    {
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Empty.csv", true);
+        await table.ToFileAsync("temp.csv", true);
+        var newTable = ObservableTableImporter.FromFilePath("temp.csv", true);
+    
+        Assert.IsTrue(table.ContentEquals(newTable));
+    }
+    
+    [TestMethod]
+    public async Task ToFileAsync_Empty_HasNoHeader()
+    {
+        var table = ObservableTableImporter.FromFilePath(CsvFolder + "Empty.csv", false);
+        await table.ToFileAsync("temp.csv", false);
+        var newTable = ObservableTableImporter.FromFilePath("temp.csv", false);
+    
         Assert.IsTrue(table.ContentEquals(newTable));
     }
 }
