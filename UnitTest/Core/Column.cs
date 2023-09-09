@@ -29,6 +29,7 @@ public class Column
     {
         Column<string> expected = new("header", Array.Empty<string>());
         Column<string> actual = new("differentHeader", Array.Empty<string>());
+    }
 
     public void Column_DifferentColumnNames_Equals_NotEqual()
     {
