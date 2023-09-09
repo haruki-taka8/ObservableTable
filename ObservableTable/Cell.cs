@@ -1,14 +1,4 @@
-<<<<<<< HEAD:ObservableTable/Cell.cs
 ﻿namespace ObservableTable.Core;
-=======
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ObservableTable.Core;
->>>>>>> main:ObservableTable/Core/Cell.cs
 
 /// <summary>
 /// Describe a cell of type <typeparamref name="T"/>.
